@@ -69,6 +69,35 @@ $app->post('/agregarTrampa', function ($req, $res) {
 	return $res;
 });
 
+$app->post('/eliminarTrampa', function ($req, $res) {
+	$params = $req->getParams();
+	$id = (int)$params['id'];
+	try{
+		$trampa = new Trampa($id);
+		$resultado = $trampa->eliminar();
+
+		if($resultado == false){
+			$mensaje = "No se pudo eliminar la trampa.";
+			$codigo = -1;
+		}else{
+			$mensaje = "Trampa eliminada exitosamente.";
+			$codigo = 1;
+		}
+
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje ]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -2, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
 //Devuelve todas las trampas de la tabla Trampa y la ultima colocacion de cada una.
 $app->get('/obtenerTrampas', function ($req, $res) {
 	$params = $req->getParams();

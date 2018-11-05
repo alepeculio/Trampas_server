@@ -58,8 +58,21 @@ class Trampa {
 		}
 	}
 
+	public function eliminar(){
+		$id = $this->getId();
+		$activa = 0;
+		$sql = DB::conexion()->prepare("UPDATE trampa SET activa=? WHERE id=?");
+		
+		if($sql == null)
+			throw new Exception('Error de conexion con la BD.');
+
+		$sql->bind_param("ii", $activa, $id);
+		
+		return $sql->execute();
+	}
+
 	public function obtenerTrampas(){
-		$sql = DB::conexion()->prepare("SELECT * FROM trampa ORDER BY id DESC");
+		$sql = DB::conexion()->prepare("SELECT * FROM trampa WHERE activa=1 ORDER BY id DESC");
 		if($sql == null)
 			throw new Exception('Error de conexion con la BD.');
 		$sql->execute();
@@ -112,7 +125,7 @@ class Trampa {
 	}
 
 	public function obtenerTrampasNoColocadas(){
-		$sql = DB::conexion()->prepare("SELECT * FROM `trampa` WHERE id NOT IN (SELECT trampa FROM colocacion WHERE fechaFin IS NULL)");
+		$sql = DB::conexion()->prepare("SELECT * FROM `trampa` WHERE activa=1 AND id NOT IN (SELECT trampa FROM colocacion WHERE fechaFin IS NULL)");
 
 		if($sql == null)
 			throw new Exception('Error de conexion con la BD.');
@@ -127,7 +140,7 @@ class Trampa {
 	}
 
 	public function obtenerTrampasColocadas(){
-		$sql = DB::conexion()->prepare("SELECT * FROM `trampa` WHERE id IN (SELECT trampa FROM colocacion WHERE fechaFin IS NULL)");
+		$sql = DB::conexion()->prepare("SELECT * FROM `trampa` WHERE activa=1 AND id IN (SELECT trampa FROM colocacion WHERE fechaFin IS NULL)");
 
 		if($sql == null)
 			throw new Exception('Error de conexion con la BD.');

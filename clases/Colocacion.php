@@ -51,7 +51,7 @@ class Colocacion extends Trampa{
 
     public function obtenerColocacionesActivas(){
         //$sql = DB::conexion()->prepare("SELECT * FROM `colocacion` WHERE fechaFin IS NULL");
-        $sql = DB::conexion()->prepare("SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.usuario, c.trampa, t.nombre, t.mac FROM `colocacion` c INNER JOIN `trampa` t ON c.trampa = t.id WHERE c.fechaFin IS NULL");
+        $sql = DB::conexion()->prepare("SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.usuario, c.trampa, t.nombre, t.mac FROM `colocacion` c INNER JOIN `trampa` t ON c.trampa = t.id WHERE t.activa = 1 AND c.fechaFin IS NULL");
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
