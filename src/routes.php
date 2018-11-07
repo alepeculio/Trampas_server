@@ -296,22 +296,30 @@ $app->post('/obtenerColocacionesTrampa', function ($req, $res) {
 	return $res;
 });
 
-$app->get('/agregarUsuario', function ($req, $res) {	
+$app->post('/agregarUsuario', function ($req, $res) {	
 	$params = $req->getParams();
 	$correo = $params['correo'];
 	$nombre = $params['nombre'];
 	$apellido = $params['apellido'];
-	$fnac = $params['fnac'];
+	/*$fnac = $params['fnac'];*/
 	$contrasenia = $params['contrasenia'];
 	$admin = (bool)$params['admin'];
 	
 	try{
-		$usuario = new Usuario(0,$correo, $nombre, $apellido, $fnac, $contrasenia, $admin);
+		$usuario = new Usuario(0,$correo, $nombre, $apellido, "", $contrasenia, $admin);
 		$resultado = $usuario-> agregar();
+		$codigo;
+		if($resultado){
+			$codigo = 1;
+			$mensaje = 'Registrado correctamente';
+		}else{
+			$codigo = 0;
+			$mensaje = 'Correo ya en uso';
+		}
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['resultado' => $resultado ]));
+		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje]));
 
 	}catch(Exception $e){
 		$res = $res->

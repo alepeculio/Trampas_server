@@ -29,11 +29,13 @@ class Usuario{
             throw new Exception('Error de conexion con la BD.');
 
         $sql->bind_param("sssssi",$this->getCorreo(), $this->getNombre(), $this->getApellido(), $this->getFnac(), $this->getContrasenia(), $this->getAdmin());
-		if ($sql->execute()){
+		
+        return $sql->execute();
+        /*if ($sql->execute()){
 			return $sql->insert_id;
 		}else{
 			return false;
-		}
+		}*/
 	}
 
     function login(){
