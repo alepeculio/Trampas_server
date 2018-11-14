@@ -254,6 +254,87 @@ $app->post('/extraerTrampa', function ($req, $res) {
 	return $res;
 });
 
+$app->post('/actualizarUbicacionColocacion', function ($req, $res) {
+	$params = $req->getParams();
+	$id = (int)$params['id'];
+	$lat = (double)$params['lat'];
+	$lon = (double)$params['lon'];
+	try{
+		$colocacion = new Colocacion($lat,$lon);
+		$resultado = $colocacion->actualizarUbicacion($id);
+
+		if($resultado == false){
+			$mensaje = "No se pudo guardar los cambios.";
+			$codigo = -1;
+		}else{
+			$mensaje = "Cambios guardados";
+			$codigo = 1;
+		}
+
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje ]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -2, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
+$app->post('/actualizarColocacion', function ($req, $res) {
+	$params = $req->getParams();
+	$id = (int)$params['id'];
+	$lat = (double)$params['lat'];
+	$lon = (double)$params['lon'];
+	$fechaInicio = $params['finicio'];
+	$fechaFin = $params['ffin'];
+	$tMin = (float)$params['tmin'];
+	$tMax = (float)$params['tmax'];
+	$tProm = (float)$params['tprom'];
+	$hMin = (float)$params['hmin'];
+	$hMax = (float)$params['hmax'];
+	$hProm = (float)$params['hprom'];
+	$leishmaniasis = (boolean)$params['leishmaniasis'];
+
+	try{
+		$colocacion = new Colocacion($lat, $lon);
+		$colocacion->setFechaInicio($fechaInicio);
+		$colocacion->setFechaFin($fechaFin);
+		$colocacion->setTempMin($tMin);
+		$colocacion->setTempMax($tMax);
+		$colocacion->setHumMin($hMin);
+		$colocacion->setHumMax($hMax);
+		$colocacion->setTempProm($tProm);
+		$colocacion->setHumProm($hProm);
+		$colocacion->setLeishmaniasis($leishmaniasis);
+		$resultado = $colocacion->actualizar($id);
+
+		if($resultado == false){
+			$mensaje = "No se pudo actualizar colocación.";
+			$codigo = "-1";
+		}else{
+			$mensaje = "Colocación actualizada";
+			$codigo = "1";
+		}
+
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje ]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => "-2", 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
 //Devuelve todas las colocaciones cuya fecha de fin no es null.
 $app->get('/obtenerColocacionesActivas', function ($req, $res) {
 	$params = $req->getParams();
@@ -296,6 +377,27 @@ $app->post('/obtenerColocacionesTrampa', function ($req, $res) {
 	return $res;
 });
 
+$app->get('/obtenerColocacion', function ($req, $res) {
+	$params = $req->getParams();
+	$id = (int)$params['id'];
+
+	try{
+		$colocacion = new Colocacion();
+		$resultado = $colocacion->obtenerColocacion($id);
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Colocación obtenida correctamente', 'colocacion' => $resultado]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -1, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
 $app->post('/agregarUsuario', function ($req, $res) {	
 	$params = $req->getParams();
 	$correo = $params['correo'];
@@ -303,7 +405,7 @@ $app->post('/agregarUsuario', function ($req, $res) {
 	$apellido = $params['apellido'];
 	/*$fnac = $params['fnac'];*/
 	$contrasenia = $params['contrasenia'];
-	$admin = (bool)$params['admin'];
+	$admin = (int)$params['admin'];
 	
 	try{
 		$usuario = new Usuario(0,$correo, $nombre, $apellido, "", $contrasenia, $admin);

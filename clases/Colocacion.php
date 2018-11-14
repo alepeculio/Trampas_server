@@ -14,6 +14,7 @@ class Colocacion extends Trampa{
     public $humProm;
 	public $fechaInicio;
 	public $fechaFin;
+    public $leishmaniasis;
 	public $usuario;
 	
 
@@ -51,7 +52,7 @@ class Colocacion extends Trampa{
 
     public function obtenerColocacionesActivas(){
         //$sql = DB::conexion()->prepare("SELECT * FROM `colocacion` WHERE fechaFin IS NULL");
-        $sql = DB::conexion()->prepare("SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.usuario, c.trampa, t.nombre, t.mac FROM `colocacion` c INNER JOIN `trampa` t ON c.trampa = t.id WHERE t.activa = 1 AND c.fechaFin IS NULL");
+        $sql = DB::conexion()->prepare("SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.leishmaniasis, c.usuario, c.trampa, t.nombre, t.mac FROM `colocacion` c INNER JOIN `trampa` t ON c.trampa = t.id WHERE t.activa = 1/* AND c.fechaFin IS NULL*/");
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
@@ -62,6 +63,7 @@ class Colocacion extends Trampa{
          $fila->trampa = $trampa;
          unset( $fila->nombre );
          unset( $fila->mac );
+         $fila->leishmaniasis = (boolean)$fila->leishmaniasis;
          $colocaciones[] = $fila;
         }
          return $colocaciones;
@@ -78,9 +80,65 @@ class Colocacion extends Trampa{
         $resultado=$sql->get_result();
         while ($fila=$resultado->fetch_object()) {
             $fila->trampa = null;
+            $fila->leishmaniasis = (boolean)$fila->leishmaniasis;
             $colocaciones[] = $fila;
         }
         return $colocaciones;
+    }
+
+    public function actualizarUbicacion($id){
+        $lat = $this->getLat();
+        $lon = $this->getLon();
+        $sql = DB::conexion()->prepare("UPDATE colocacion SET lat=?, lon=? WHERE idColocacion=?");
+        
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("ddi",$lat, $lon, $id);
+        
+        return $sql->execute();
+    }
+
+    public function actualizar($id){
+        $lat = $this->getLat();
+        $lon = $this->getLon();
+        $tempMin = $this->getTempMin();
+        $tempMax = $this->getTempMax();
+        $tempProm = $this->getTempProm();
+        $humMin = $this->getHumMin();
+        $humMax = $this->getHumMax();
+        $humProm = $this->getHumProm();
+        $fechaInicio = $this->getFechaInicio();
+        $fechaFin = $this->getFechaFin();
+        $leishmaniasis = $this->getLeishmaniasis();
+        $sql = DB::conexion()->prepare("UPDATE colocacion SET lat=?, lon=?, tempMin=?, tempMax=?, humMin=?, humMax=?, tempProm=?, humProm=?, fechaInicio=?, fechaFin=?, leishmaniasis=? WHERE idColocacion=?");
+        
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("ddssssssssii",$lat, $lon, $tempMin, $tempMax, $humMin, $humMax, $tempProm, $humProm, $fechaInicio, $fechaFin, $leishmaniasis, $id);
+        
+        return $sql->execute();
+    }
+
+    public function obtenerColocacion($id){
+        $sql = DB::conexion()->prepare("SELECT * FROM colocacion WHERE idColocacion=?");
+        
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("i", $id);
+        $sql->execute();
+       
+        $colocacion;
+
+        $resultado = $sql->get_result();
+
+        while ($c = $resultado->fetch_object()) {
+           $c->leishmaniasis = (boolean)$c->leishmaniasis;
+            $colocacion[] = $c;
+        }
+        return $colocacion;
     }
 
    /*public function obtenerUltimaColocacion($id){
@@ -218,6 +276,15 @@ class Colocacion extends Trampa{
 
     public function setHumProm($humProm){
         $this->humProm = $humProm;
+        return $this;
+    }
+
+    public function getLeishmaniasis(){
+        return $this->leishmaniasis;
+    }
+
+    public function setLeishmaniasis($leishmaniasis){
+        $this->leishmaniasis = $leishmaniasis;
         return $this;
     }
 }
