@@ -15,7 +15,7 @@ $app->post('/login', function($req, $res) {
 	$this->logger->addInfo("INFO: Login: Usuario".$correo); 
 
 	try{
-		$usuario = new Usuario(0,$correo, NULL, NULL, NULL, $contrasenia, 0);
+		$usuario = new Usuario(0,$correo, NULL, NULL, $contrasenia, 0);
 		$usuarioLogueado = $usuario-> login();
 		if($usuarioLogueado != 0){
 			$codigo = 1;
@@ -403,12 +403,11 @@ $app->post('/agregarUsuario', function ($req, $res) {
 	$correo = $params['correo'];
 	$nombre = $params['nombre'];
 	$apellido = $params['apellido'];
-	/*$fnac = $params['fnac'];*/
 	$contrasenia = $params['contrasenia'];
 	$admin = (int)$params['admin'];
 	
 	try{
-		$usuario = new Usuario(0,$correo, $nombre, $apellido, "", $contrasenia, $admin);
+		$usuario = new Usuario(0,$correo, $nombre, $apellido, $contrasenia, $admin);
 		$resultado = $usuario-> agregar();
 		$codigo;
 		if($resultado){
@@ -422,6 +421,25 @@ $app->post('/agregarUsuario', function ($req, $res) {
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
 		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -1, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
+$app->get('/obtenerUsuarios', function ($req, $res) {
+	$params = $req->getParams();
+	try{
+		$usuario = new Usuario();
+		$resultado = $usuario->obtenerUsuarios();
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'usuarios' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->

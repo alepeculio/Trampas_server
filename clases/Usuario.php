@@ -7,28 +7,26 @@ class Usuario{
 	private $correo;
 	private $nombre;
 	private $apellido;
-	private $fnac;
 	private $contrasenia;
 	private $admin;
 	
-	function __construct($id = 0, $correo = "", $nombre = "", $apellido = "", $fnac = "", $contrasenia = "", $admin = false){
+	function __construct($id = 0, $correo = "", $nombre = "", $apellido = "", $contrasenia = "", $admin = false){
 
 		$this->id = $id;
 		$this->correo = $correo;
 		$this->nombre = $nombre;
 		$this->apellido = $apellido;
-		$this->fnac = $fnac;
 		$this->contrasenia = $contrasenia;
 		$this->admin = $admin;
 	}
 
 	function agregar(){
-		$sql = DB::conexion()->prepare("INSERT INTO usuario (correo, nombre, apellido, fnac, contrasenia, admin) VALUES(?,?,?,?,?,?)");
+		$sql = DB::conexion()->prepare("INSERT INTO usuario (correo, nombre, apellido, contrasenia, admin) VALUES(?,?,?,?,?)");
 		
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
-        $sql->bind_param("sssssi",$this->getCorreo(), $this->getNombre(), $this->getApellido(), $this->getFnac(), $this->getContrasenia(), $this->getAdmin());
+        $sql->bind_param("ssssi",$this->getCorreo(), $this->getNombre(), $this->getApellido(), $this->getContrasenia(), $this->getAdmin());
 		
         return $sql->execute();
         /*if ($sql->execute()){
@@ -39,7 +37,7 @@ class Usuario{
 	}
 
     function login(){
-        $sql = DB::conexion()->prepare("SELECT * FROM usuario  WHERE correo = ? AND contrasenia = ?");
+        $sql = DB::conexion()->prepare("SELECT * FROM usuario  WHERE correo = ? AND contrasenia = ? AND activo=1");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -54,6 +52,21 @@ class Usuario{
         }else{
             return 0;
         }
+    }
+
+    public function obtenerUsuarios(){
+        $sql = DB::conexion()->prepare("SELECT * FROM `usuario` WHERE activo=1 AND admin != 3");
+
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->execute();
+
+        $resultado=$sql->get_result();
+        while ($fila=$resultado->fetch_object()) {
+            $usuarios[] = $fila;
+        }
+        return $usuarios;
     }
 
 
