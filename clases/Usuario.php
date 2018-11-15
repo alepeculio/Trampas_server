@@ -69,6 +69,33 @@ class Usuario{
         return $usuarios;
     }
 
+    public function actualizarPrivilegios(){
+        $id = $this->getId();
+        $admin = $this->getAdmin();
+        $sql = DB::conexion()->prepare("UPDATE usuario SET admin=? WHERE id=?");
+        
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("ii", $admin, $id);
+        
+        return $sql->execute();
+    }
+
+
+    public function eliminar(){
+        $id = $this->getId();
+        $activo = 0;
+        $sql = DB::conexion()->prepare("UPDATE usuario SET activo=? WHERE id=?");
+        
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("ii", $activo, $id);
+        
+        return $sql->execute();
+    }
+
 
     /**
      * @return mixed

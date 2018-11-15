@@ -449,3 +449,63 @@ $app->get('/obtenerUsuarios', function ($req, $res) {
 	}
 	return $res;
 });
+
+$app->post('/actualizarPrivilegios', function ($req, $res) {
+	$params = $req->getParams();
+	$id = (int)$params['id'];
+	$admin = (int)$params['admin'];
+	try{
+		$usuario = new Usuario($id, null, null, null, null, $admin);
+		$resultado = $usuario->actualizarPrivilegios();
+
+		if($resultado == false){
+			$mensaje = "No se pudo actualizar los privilegios.";
+			$codigo = -1;
+		}else{
+			$mensaje = "Privilegios actualizados";
+			$codigo = 1;
+		}
+
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje ]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -2, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
+$app->post('/eliminarUsuario', function ($req, $res) {
+	$params = $req->getParams();
+	$id = (int)$params['id'];
+
+	try{
+		$usuario = new Usuario($id);
+		$resultado = $usuario->eliminar();
+
+		if($resultado == false){
+			$mensaje = "No se pudo eliminar el usuario.";
+			$codigo = -1;
+		}else{
+			$mensaje = "Usuario eliminado exitosamente.";
+			$codigo = 1;
+		}
+
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje ]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -2, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
