@@ -27,7 +27,7 @@ class Usuario{
             throw new Exception('Error de conexion con la BD.');
 
         $sql->bind_param("ssssi",$this->getCorreo(), $this->getNombre(), $this->getApellido(), $this->getContrasenia(), $this->getAdmin());
-		
+
         return $sql->execute();
         /*if ($sql->execute()){
 			return $sql->insert_id;
@@ -94,6 +94,35 @@ class Usuario{
         $sql->bind_param("ii", $activo, $id);
         
         return $sql->execute();
+    }
+
+    public function cambiarContrasenia($actual, $nueva){
+        $id = $this->getId();
+
+        $sql = DB::conexion()->prepare("SELECT * FROM usuario  WHERE id = ? AND contrasenia = ? AND activo=1");
+
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("is", $id, $actual);
+        $sql->execute();
+
+        $resultado = $sql->get_result();
+
+        if($resultado->num_rows == 1){ 
+           $sql2 = DB::conexion()->prepare("UPDATE usuario SET contrasenia = ? WHERE id=?");
+
+            if($sql2 == null)
+                throw new Exception('Error de conexion con la BD.');
+
+            $sql2->bind_param("si", $nueva, $id);
+            if($sql2->execute())
+                return 1;
+            else
+                return 0;
+        }else{
+            return 2;
+        }
     }
 
 

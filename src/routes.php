@@ -9,8 +9,8 @@ set_include_path(dirname(__FILE__) . '/../../');
 
 $app->post('/login', function($req, $res) {
 	$params=$req->getParams();
-	$correo=$params["correo"];
-	$contrasenia=$params["contrasenia"];
+	$correo=$params['correo'];
+	$contrasenia=$params['contrasenia'];
 	
 	$this->logger->addInfo("INFO: Login: Usuario".$correo); 
 
@@ -51,7 +51,7 @@ $app->post('/agregarTrampa', function ($req, $res) {
 			$mensaje = "Nombre ya en uso.";
 			$codigo = -1;
 		}else{
-			$mensaje = "Trampa agregada exitosamente.";
+			$mensaje = "Trampa agregada.";
 			$codigo = $resultado;
 		}
 
@@ -80,7 +80,7 @@ $app->post('/eliminarTrampa', function ($req, $res) {
 			$mensaje = "No se pudo eliminar la trampa.";
 			$codigo = -1;
 		}else{
-			$mensaje = "Trampa eliminada exitosamente.";
+			$mensaje = "Trampa eliminada.";
 			$codigo = 1;
 		}
 
@@ -193,10 +193,10 @@ $app->post('/colocarTrampa', function ($req, $res) {
 		$resultado = $colocacion -> colocarTrampa();
 		if($resultado == false){
 			$codigo = 0;
-			$mensaje = "Error al colocar la trampa";
+			$mensaje = "Error al colocar la trampa.";
 		}else{
 			$codigo = $resultado;
-			$mensaje = "Trampa colocada exitosamente";
+			$mensaje = "Trampa colocada.";
 		}
 		$res = $res->
 		withStatus(200)->
@@ -238,7 +238,7 @@ $app->post('/extraerTrampa', function ($req, $res) {
 			$mensaje = "Error al extraer la trampa";
 		}else{
 			$codigo = 1;
-			$mensaje = "Trampa extraida exitosamente";
+			$mensaje = "Trampa extraida.";
 		}
 		$res = $res->
 		withStatus(200)->
@@ -412,10 +412,10 @@ $app->post('/agregarUsuario', function ($req, $res) {
 		$codigo;
 		if($resultado){
 			$codigo = 1;
-			$mensaje = 'Registrado correctamente';
+			$mensaje = 'Registrado correctamente.';
 		}else{
 			$codigo = 0;
-			$mensaje = 'Correo ya en uso';
+			$mensaje = 'Correo ya en uso.';
 		}
 		$res = $res->
 		withStatus(200)->
@@ -462,7 +462,7 @@ $app->post('/actualizarPrivilegios', function ($req, $res) {
 			$mensaje = "No se pudo actualizar los privilegios.";
 			$codigo = -1;
 		}else{
-			$mensaje = "Privilegios actualizados";
+			$mensaje = "Privilegios actualizados.";
 			$codigo = 1;
 		}
 
@@ -492,8 +492,43 @@ $app->post('/eliminarUsuario', function ($req, $res) {
 			$mensaje = "No se pudo eliminar el usuario.";
 			$codigo = -1;
 		}else{
-			$mensaje = "Usuario eliminado exitosamente.";
+			$mensaje = "Usuario eliminado.";
 			$codigo = 1;
+		}
+
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje ]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -2, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
+$app->post('/cambiarContrasenia', function ($req, $res) {
+	$params = $req->getParams();
+	$id = (int)$params['id'];
+	$contraseniaActual = $params['contrasenia_actual'];
+	$contraseniaNueva = $params['contrasenia_nueva'];
+
+	try{
+		$usuario = new Usuario($id);
+		$resultado = $usuario->cambiarContrasenia($contraseniaActual, $contraseniaNueva);
+
+		if($resultado == 2){
+			$mensaje = "Contraseña actual incorrecta.";
+			$codigo = 2;
+		}else if($resultado == 1){
+			$mensaje = "Contraseña cambiada.";
+			$codigo = 1;
+		}else {
+			$mensaje = "No se pudo cambiar la contraseña.";
+			$codigo = 0;			
 		}
 
 		$res = $res->
