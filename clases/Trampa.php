@@ -74,7 +74,7 @@ class Trampa {
 	public function obtenerTrampas($leishmaniasis = false){
 		$query;
 		if($leishmaniasis)
-			$query = "SELECT t.id, t.nombre, t.mac FROM trampa AS t INNER JOIN colocacion AS c WHERE t.activa=1 AND c.leishmaniasis=1 ORDER BY id DESC";
+			$query = "SELECT DISTINCT t.id, t.nombre, t.mac FROM trampa AS t INNER JOIN colocacion AS c WHERE t.id = c.trampa AND t.activa=1 AND c.leishmaniasis=1 ORDER BY t.id DESC";
 		 else 
 			$query = "SELECT * FROM trampa WHERE activa=1 ORDER BY id DESC";
 		
