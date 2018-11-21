@@ -118,6 +118,25 @@ $app->get('/obtenerTrampas', function ($req, $res) {
 	return $res;
 });
 
+$app->get('/obtenerTrampasLeishmaniasis', function ($req, $res) {
+	$params = $req->getParams();
+	try{
+		$trampa = new Trampa();
+		$resultado = $trampa->obtenerTrampas(true);
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'trampas' => $resultado]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -1, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
 //Devuelve todas las trampas que no tienen un colocacion activa.
 $app->get('/obtenerTrampasNoColocadas', function ($req, $res) {
 	$params = $req->getParams();

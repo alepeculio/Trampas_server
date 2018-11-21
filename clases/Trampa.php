@@ -71,8 +71,15 @@ class Trampa {
 		return $sql->execute();
 	}
 
-	public function obtenerTrampas(){
-		$sql = DB::conexion()->prepare("SELECT * FROM trampa WHERE activa=1 ORDER BY id DESC");
+	public function obtenerTrampas($leishmaniasis = false){
+		$query;
+		if($leishmaniasis)
+			$query = "SELECT t.id, t.nombre, t.mac FROM trampa AS t INNER JOIN colocacion AS c WHERE t.activa=1 AND c.leishmaniasis=1 ORDER BY id DESC";
+		 else 
+			$query = "SELECT * FROM trampa WHERE activa=1 ORDER BY id DESC";
+		
+
+		$sql = DB::conexion()->prepare($query);
 		if($sql == null)
 			throw new Exception('Error de conexion con la BD.');
 		$sql->execute();
