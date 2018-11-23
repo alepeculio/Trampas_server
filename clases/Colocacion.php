@@ -27,7 +27,7 @@ class Colocacion extends Trampa{
 	}
 
 
-	function colocarTrampa(){
+	/*function colocarTrampa(){
 		$sql = DB::conexion()->prepare("INSERT INTO colocacion (lat, lon, fechaInicio, trampa, usuario) VALUES(?,?,?,?,?)");
 		if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -35,6 +35,56 @@ class Colocacion extends Trampa{
         $sql->bind_param("ddsii", $this->getLat(), $this->getLon(), $this->getFechaInicio(), $this->getId(),$this->getUsuario());
         if($sql->execute()){
             return $sql->insert_id;
+        }else{
+            return false;
+        }
+    }*/
+
+    function colocarTrampa(){
+        //Obtener periodos de la trampa de la colocacion actual
+        $sql = DB::conexion()->prepare("SELECT COUNT(p.id) AS cantidad, p.id FROM periodo AS p LEFT JOIN colocacion AS c ON p.colocacion = c.idColocacion WHERE c.trampa = ? GROUP BY p.id ORDER BY p.id DESC");
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("i", $this->getId());
+        $sql->execute();
+        $resultado = $sql->get_result();
+
+        if($resultado->num_rows != null){
+            while ($fila = $resultado -> fetch_object()) {
+                $coso[] = $fila;
+                if( $fila->cantidad < 3){
+                    return $this->insertarTrampa($fila->id);
+                }else{
+                    return $this->insertarTrampa();
+                }
+            }
+            return $coso;
+        }else{
+           return $this->insertarTrampa();
+        }
+    }
+
+    function insertarTrampa($id = 0){
+        $sql = DB::conexion()->prepare("INSERT INTO colocacion (lat, lon, fechaInicio, trampa, usuario) VALUES(?,?,?,?,?)");
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("ddsii", $this->getLat(), $this->getLon(), $this->getFechaInicio(), $this->getId(),$this->getUsuario());
+        if($sql->execute()){
+            $idColocacion = $sql->insert_id;
+
+            $sql2 = DB::conexion()->prepare("INSERT INTO periodo (id, colocacion) VALUES(?,?)");
+            if($sql2 == null)
+                throw new Exception('Error de conexion con la BD.');
+            
+            $sql2->bind_param("ii", $id, $idColocacion);
+            
+            if($sql2->execute()){
+                return $idColocacion;
+            }else{
+                return false;
+            }
         }else{
             return false;
         }
@@ -52,7 +102,12 @@ class Colocacion extends Trampa{
 
     public function obtenerColocacionesActivas(){
         //$sql = DB::conexion()->prepare("SELECT * FROM `colocacion` WHERE fechaFin IS NULL");
-        $sql = DB::conexion()->prepare("SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.leishmaniasis, c.usuario, c.trampa, t.nombre, t.mac FROM `colocacion` c INNER JOIN `trampa` t ON c.trampa = t.id WHERE t.activa = 1/* AND c.fechaFin IS NULL*/");
+        $sql = DB::conexion()->prepare("
+            SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.leishmaniasis, c.usuario, p.id AS periodo, c.trampa, t.nombre, t.mac
+            FROM `colocacion` c 
+            INNER JOIN `trampa` t ON c.trampa = t.id 
+            INNER JOIN `periodo` p ON c.idColocacion = p.colocacion
+            WHERE t.activa = 1 ORDER BY c.fechaInicio DESC/* AND c.fechaFin IS NULL*/");
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
@@ -71,7 +126,7 @@ class Colocacion extends Trampa{
 
 
     public function obtenerColocacionesTrampa( $idTrampa ){
-        $sql = DB::conexion()->prepare("SELECT * FROM colocacion WHERE trampa =".$idTrampa. " ORDER BY idColocacion DESC");
+        $sql = DB::conexion()->prepare("SELECT * FROM colocacion WHERE trampa =".$idTrampa. " ORDER BY fechaInicio DESC");
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
@@ -139,6 +194,30 @@ class Colocacion extends Trampa{
             $colocacion[] = $c;
         }
         return $colocacion;
+    }
+
+    public function obtenerColocacionesGrafica($idPeriodo){
+         $sql = DB::conexion()->prepare("
+            SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.leishmaniasis, c.usuario, p.id AS periodo FROM periodo AS p 
+            RIGHT JOIN colocacion AS c 
+            ON p.colocacion = c.idColocacion 
+            WHERE p.id = ?");
+        
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("i", $idPeriodo);
+        $sql->execute();
+        
+        $resultado = $sql->get_result();
+        $colocaciones = [];
+        while ($fila = $resultado->fetch_object()) {
+          $fila->trampa = null;
+          $fila->leishmaniasis = (boolean)$fila->leishmaniasis;
+          $colocaciones[] = $fila;
+        }
+        return $colocaciones;
+     
     }
 
    /*public function obtenerUltimaColocacion($id){

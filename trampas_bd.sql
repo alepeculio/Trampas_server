@@ -3,10 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 14, 2018 at 06:57 PM
+-- Generation Time: Nov 23, 2018 at 05:29 PM
 -- Server version: 10.1.31-MariaDB
 -- PHP Version: 7.2.3
-
 use u520566866_tramp;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -46,6 +45,31 @@ CREATE TABLE `colocacion` (
   `trampa` int(11) NOT NULL,
   `usuario` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `colocacion`
+--
+
+INSERT INTO `colocacion` (`idColocacion`, `lat`, `lon`, `tempMin`, `tempMax`, `humMin`, `humMax`, `tempProm`, `humProm`, `fechaInicio`, `fechaFin`, `leishmaniasis`, `trampa`, `usuario`) VALUES
+(71, -32.3142892, -58.0510503, NULL, NULL, NULL, NULL, NULL, NULL, '2018-11-23 13:22:22', NULL, 0, 99, 29);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `periodo`
+--
+
+CREATE TABLE `periodo` (
+  `id` int(11) NOT NULL,
+  `colocacion` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `periodo`
+--
+
+INSERT INTO `periodo` (`id`, `colocacion`) VALUES
+(25, 71);
 
 -- --------------------------------------------------------
 
@@ -88,9 +112,8 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `correo`, `nombre`, `apellido`, `activo`, `contrasenia`, `admin`) VALUES
-(29, 'alejandropeculio@gmail.com', 'Alejandro', 'Peculio', 1, '1', 1),
-(30, 'visitante@trampas.com', 'Usuario', 'visitante', 1, 'visitante', 3),
-(31, 'prueba@gmail.com', 'prueba', 'prueba', 1, '1', 2);
+(29, 'alejandropeculio@gmail.com', 'Alejandro', 'Peculio', 1, 'ale', 1),
+(30, 'visitante@trampas.com', 'Usuario', 'visitante', 1, 'visitante', 3);
 
 --
 -- Indexes for dumped tables
@@ -103,6 +126,13 @@ ALTER TABLE `colocacion`
   ADD PRIMARY KEY (`idColocacion`),
   ADD KEY `usuario` (`usuario`),
   ADD KEY `trampa` (`trampa`);
+
+--
+-- Indexes for table `periodo`
+--
+ALTER TABLE `periodo`
+  ADD PRIMARY KEY (`id`,`colocacion`),
+  ADD KEY `colocacion` (`colocacion`);
 
 --
 -- Indexes for table `trampa`
@@ -126,19 +156,25 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT for table `colocacion`
 --
 ALTER TABLE `colocacion`
-  MODIFY `idColocacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `idColocacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+
+--
+-- AUTO_INCREMENT for table `periodo`
+--
+ALTER TABLE `periodo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `trampa`
 --
 ALTER TABLE `trampa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- Constraints for dumped tables
@@ -150,6 +186,12 @@ ALTER TABLE `usuario`
 ALTER TABLE `colocacion`
   ADD CONSTRAINT `colocacion_ibfk_1` FOREIGN KEY (`usuario`) REFERENCES `usuario` (`id`),
   ADD CONSTRAINT `colocacion_ibfk_2` FOREIGN KEY (`trampa`) REFERENCES `trampa` (`id`);
+
+--
+-- Constraints for table `periodo`
+--
+ALTER TABLE `periodo`
+  ADD CONSTRAINT `periodo_ibfk_1` FOREIGN KEY (`colocacion`) REFERENCES `colocacion` (`idColocacion`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

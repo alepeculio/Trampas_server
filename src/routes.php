@@ -396,6 +396,27 @@ $app->post('/obtenerColocacionesTrampa', function ($req, $res) {
 	return $res;
 });
 
+$app->post('/obtenerColocacionesGrafica', function ($req, $res) {
+	$params = $req->getParams();
+	$idPeriodo = (int)$params['id_periodo'];
+
+	try{
+		$colocacion = new Colocacion();
+		$resultado = $colocacion->obtenerColocacionesGrafica($idPeriodo);
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'colocaciones' => $resultado]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -1, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
+
 $app->get('/obtenerColocacion', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
