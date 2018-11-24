@@ -42,7 +42,16 @@ class Colocacion extends Trampa{
 
     function colocarTrampa(){
         //Obtener periodos de la trampa de la colocacion actual
-        $sql = DB::conexion()->prepare("SELECT COUNT(p.id) AS cantidad, p.id FROM periodo AS p LEFT JOIN colocacion AS c ON p.colocacion = c.idColocacion WHERE c.trampa = ? GROUP BY p.id ORDER BY p.id DESC");
+        $sql = DB::conexion()->prepare("
+            SELECT COUNT(p.id) AS cantidad,
+                   p.id 
+            FROM periodo AS p 
+            LEFT JOIN colocacion AS c ON p.colocacion = c.idColocacion
+            WHERE c.trampa = ?
+            GROUP BY p.id
+            ORDER BY p.id DESC
+            ");
+        
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
@@ -91,7 +100,18 @@ class Colocacion extends Trampa{
     }
 
     function extraerTrampa(){
-        $sql = DB::conexion()->prepare("UPDATE colocacion SET tempMin=?, tempMax=?, humMin=?, humMax=?, tempProm=?, humProm=?, fechaFin=? WHERE trampa=? AND fechaFin IS NULL");
+        $sql = DB::conexion()->prepare("
+            UPDATE colocacion 
+            SET tempMin=?,
+                tempMax=?,
+                humMin=?,
+                humMax=?,
+                tempProm=?,
+                humProm=?,
+                fechaFin=?
+            WHERE trampa=? AND fechaFin IS NULL
+            ");
+        
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
@@ -103,11 +123,29 @@ class Colocacion extends Trampa{
     public function obtenerColocacionesActivas(){
         //$sql = DB::conexion()->prepare("SELECT * FROM `colocacion` WHERE fechaFin IS NULL");
         $sql = DB::conexion()->prepare("
-            SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.leishmaniasis, c.usuario, p.id AS periodo, c.trampa, t.nombre, t.mac
-            FROM `colocacion` c 
-            INNER JOIN `trampa` t ON c.trampa = t.id 
-            INNER JOIN `periodo` p ON c.idColocacion = p.colocacion
-            WHERE t.activa = 1 ORDER BY c.fechaInicio DESC/* AND c.fechaFin IS NULL*/");
+            SELECT c.idColocacion,
+                   c.lat, c.lon,
+                   c.tempMin,
+                   c.tempMax,
+                   c.humMin,
+                   c.humMax,
+                   c.tempProm,
+                   c.humProm,
+                   c.fechaInicio,
+                   c.fechaFin,
+                   c.leishmaniasis,
+                   c.usuario,
+                   p.id AS periodo,
+                   c.trampa,
+                   t.nombre,
+                   t.mac
+            FROM colocacion c 
+            INNER JOIN trampa t ON c.trampa = t.id 
+            INNER JOIN periodo p ON c.idColocacion = p.colocacion
+            WHERE t.activa = 1 
+            ORDER BY c.fechaInicio DESC/* AND c.fechaFin IS NULL*/
+            ");
+        
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
@@ -166,7 +204,22 @@ class Colocacion extends Trampa{
         $fechaInicio = $this->getFechaInicio();
         $fechaFin = $this->getFechaFin();
         $leishmaniasis = $this->getLeishmaniasis();
-        $sql = DB::conexion()->prepare("UPDATE colocacion SET lat=?, lon=?, tempMin=?, tempMax=?, humMin=?, humMax=?, tempProm=?, humProm=?, fechaInicio=?, fechaFin=?, leishmaniasis=? WHERE idColocacion=?");
+
+        $sql = DB::conexion()->prepare("
+            UPDATE colocacion
+            SET lat=?,
+                lon=?,
+                tempMin=?,
+                tempMax=?,
+                humMin=?,
+                humMax=?,
+                tempProm=?,
+                humProm=?,
+                fechaInicio=?,
+                fechaFin=?,
+                leishmaniasis=?
+            WHERE idColocacion=?
+            ");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -198,10 +251,23 @@ class Colocacion extends Trampa{
 
     public function obtenerColocacionesGrafica($idPeriodo){
          $sql = DB::conexion()->prepare("
-            SELECT c.idColocacion, c.lat, c.lon, c.tempMin, c.tempMax, c.humMin, c.humMax, c.tempProm, c.humProm, c.fechaInicio, c.fechaFin, c.leishmaniasis, c.usuario, p.id AS periodo FROM periodo AS p 
-            RIGHT JOIN colocacion AS c 
-            ON p.colocacion = c.idColocacion 
-            WHERE p.id = ?");
+            SELECT c.idColocacion,
+                   c.lat, c.lon,
+                   c.tempMin,
+                   c.tempMax,
+                   c.humMin,
+                   c.humMax,
+                   c.tempProm,
+                   c.humProm,
+                   c.fechaInicio,
+                   c.fechaFin,
+                   c.leishmaniasis,
+                   c.usuario,
+                   p.id AS periodo
+            FROM periodo AS p 
+            RIGHT JOIN colocacion AS c ON p.colocacion = c.idColocacion 
+            WHERE p.id = ?
+            ");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -210,6 +276,7 @@ class Colocacion extends Trampa{
         $sql->execute();
         
         $resultado = $sql->get_result();
+
         $colocaciones = [];
         while ($fila = $resultado->fetch_object()) {
           $fila->trampa = null;
@@ -217,32 +284,117 @@ class Colocacion extends Trampa{
           $colocaciones[] = $fila;
         }
         return $colocaciones;
-     
     }
 
-   /*public function obtenerUltimaColocacion($id){
-       $sql = DB::conexion()->prepare("SELECT * FROM `colocacion` c WHERE c.trampa = ? AND c.fechaFin IS NULL");
+    function enviarCorreoCSV($correo, $desde, $hasta) {
+        // This will provide plenty adequate entropy
+        $multipartSep = '-----'.md5(time()).'-----';
+
+        $headers = array(
+            "From: hospitalwebuy@gmail.com",
+            "Reply-To: hospitalwebuy@gmail.com",
+            "Content-Type: multipart/mixed; boundary=".$multipartSep
+        );
+
+        $csv = $this->generarCSV($desde, $hasta);
+
+        if($csv == -1){
+            return $csv;
+        }else{
+            $attachment = chunk_split(base64_encode($csv));
+        }
+
+        
+        $body =
+            "--$multipartSep\r\n"
+            . "Content-Type: text/plain; charset=ISO-8859-1; format=flowed\r\n"
+            . "Content-Transfer-Encoding: 7bit\r\n"
+            . "\r\n"
+            . "$body\r\n"
+            . "--$multipartSep\r\n"
+            . "Content-Type: text/csv\r\n"
+            . "Content-Transfer-Encoding: base64\r\n"
+            . "Content-Disposition: attachment; filename=datos.csv\r\n"
+            . "\r\n"
+            . "$attachment\r\n"
+            . "--$multipartSep--";
+
+        return @mail($correo, 'Trampas - Datos exportados', $body, implode("\r\n", $headers));
+    }
+
+    public function generarCSV($desde, $hasta){
+         $consulta = 
+         "SELECT p.id AS periodo,
+                   c.lat,
+                   c.lon,
+                   c.tempMin,
+                   c.tempMax,
+                   c.tempProm,
+                   c.humMin,
+                   c.humMax,
+                   c.humProm,
+                   c.fechaInicio,
+                   c.fechaFin,
+                   c.leishmaniasis,
+                   u.nombre,
+                   u.apellido, 
+                   u.correo
+            FROM colocacion AS c
+            INNER JOIN trampa AS t ON c.trampa = t.id
+            INNER JOIN usuario AS u ON c.usuario = u.id
+            INNER JOIN periodo AS p ON c.idColocacion = p.colocacion";
+
+       if($desde != '' && $hasta != '')
+            $consulta .= " WHERE c.fechaInicio BETWEEN ? AND ?";
+
+
+        $sql = DB::conexion()->prepare($consulta);
+       
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
+        
+        if($desde != '' && $hasta != '')
+            $sql->bind_param('ss', $desde, $hasta);
 
-        $sql->bind_param("i",$id);
         $sql->execute();
-        $resultado=$sql->get_result();
+        
+        $resultado = $sql->get_result();
 
-        if($resultado->num_rows == 0){
-            $sql2 = DB::conexion()->prepare("SELECT * FROM `colocacion` c WHERE c.trampa = ? ORDER BY fechaFin DESC LIMIT 1");  
-            if($sql2 == null)
-                throw new Exception('Error de conexion con la BD.');
-            $sql2->bind_param("i",$id);
-            $sql2->execute();
-            $resultado = $sql2->get_result();
-        }
+        if($resultado->num_rows > 0){
 
-        while ($fila=$resultado->fetch_object()) {
-          $colocaciones[] = $fila;
+            if (!$fp = fopen('php://temp', 'w+')) return FALSE;
+      
+            fputcsv($fp, array(
+                    'Periodo',
+                    'Lat',
+                    'Lon',
+                    'Temp min',
+                    'Temp max',
+                    'Temp prom',
+                    'Hum min',
+                    'Hum max',
+                    'Hum prom',
+                    'Fecha inicio',
+                    'Fecha fin',
+                    'Leishmaniasis',
+                    'Nombre',
+                    'Apellido',
+                    'Correo'
+            ));
+
+            $colocaciones = [];
+            while ($fila = $resultado->fetch_assoc()) {
+                   $fila->leishmaniasis = (boolean)$fila->leishmaniasis;
+                   fputcsv($fp, $fila);
+            }
+
+            rewind($fp);
+            return stream_get_contents($fp);
+
+        }else{
+            return -1;
         }
-     return $colocaciones;
- }*/
+    }
 
     public function getIdColocacion(){
     	return $this->idColocacion;

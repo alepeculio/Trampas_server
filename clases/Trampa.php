@@ -74,7 +74,15 @@ class Trampa {
 	public function obtenerTrampas($leishmaniasis = false){
 		$query;
 		if($leishmaniasis)
-			$query = "SELECT DISTINCT t.id, t.nombre, t.mac FROM trampa AS t INNER JOIN colocacion AS c WHERE t.id = c.trampa AND t.activa=1 AND c.leishmaniasis=1 ORDER BY t.id DESC";
+			$query = "SELECT DISTINCT t.id,
+									  t.nombre,
+									  t.mac
+					  FROM trampa AS t
+					  INNER JOIN colocacion AS c
+					  WHERE t.id = c.trampa
+					  		AND t.activa=1
+					  		AND c.leishmaniasis=1
+					  ORDER BY t.id DESC";
 		 else 
 			$query = "SELECT * FROM trampa WHERE activa=1 ORDER BY id DESC";
 		
@@ -88,7 +96,7 @@ class Trampa {
 		while ($filaTrampas=$resTrampas->fetch_object()) {
 			$idTrampa = $filaTrampas->id;
 
-			$sql2 = DB::conexion()->prepare("SELECT * FROM `colocacion` c WHERE c.trampa = ? AND c.fechaFin IS NULL");
+			$sql2 = DB::conexion()->prepare("SELECT * FROM colocacion c WHERE c.trampa = ? AND c.fechaFin IS NULL");
 			if($sql2 == null)
 				throw new Exception('Error de conexion con la BD.');
 
@@ -97,7 +105,7 @@ class Trampa {
 			$resColocacion=$sql2->get_result();
 
 			if($resColocacion->num_rows == 0){
-				$sql3 = DB::conexion()->prepare("SELECT * FROM `colocacion` c WHERE c.trampa = ? ORDER BY fechaFin DESC LIMIT 1");  
+				$sql3 = DB::conexion()->prepare("SELECT * FROM colocacion c WHERE c.trampa = ? ORDER BY fechaFin DESC LIMIT 1");  
 				if($sql2 == null)
 					throw new Exception('Error de conexion con la BD.');
 				$sql3->bind_param("i", $idTrampa);
@@ -132,7 +140,14 @@ class Trampa {
 	}
 
 	public function obtenerTrampasNoColocadas(){
-		$sql = DB::conexion()->prepare("SELECT * FROM `trampa` WHERE activa=1 AND id NOT IN (SELECT trampa FROM colocacion WHERE fechaFin IS NULL)");
+		$sql = DB::conexion()->prepare("
+			SELECT *
+			FROM trampa 
+			WHERE activa=1 
+				  AND id NOT IN (SELECT trampa 
+				  				 FROM colocacion
+				  				 WHERE fechaFin IS NULL)
+			");
 
 		if($sql == null)
 			throw new Exception('Error de conexion con la BD.');
@@ -147,7 +162,14 @@ class Trampa {
 	}
 
 	public function obtenerTrampasColocadas(){
-		$sql = DB::conexion()->prepare("SELECT * FROM `trampa` WHERE activa=1 AND id IN (SELECT trampa FROM colocacion WHERE fechaFin IS NULL)");
+		$sql = DB::conexion()->prepare("
+			SELECT *
+			FROM trampa
+			WHERE activa=1 
+				  AND id IN (SELECT trampa
+				  			 FROM colocacion
+				  			 WHERE fechaFin IS NULL)
+			");
 
 		if($sql == null)
 			throw new Exception('Error de conexion con la BD.');

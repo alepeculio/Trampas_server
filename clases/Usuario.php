@@ -126,143 +126,67 @@ class Usuario{
     }
 
 
-    /**
-     * @return mixed
-     */
-    public function getId()
-    {
+ 
+    public function getId(){
     	return $this->id;
     }
 
-    /**
-     * @param mixed $id
-     *
-     * @return self
-     */
-    public function setId($id)
-    {
+    public function setId($id){
     	$this->id = $id;
-
     	return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCorreo()
-    {
+    public function getCorreo(){
     	return $this->correo;
     }
 
-    /**
-     * @param mixed $correo
-     *
-     * @return self
-     */
-    public function setCorreo($correo)
-    {
+    public function setCorreo($correo){
     	$this->correo = $correo;
-
     	return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNombre()
-    {
+    public function getNombre(){
     	return $this->nombre;
     }
 
-    /**
-     * @param mixed $nombre
-     *
-     * @return self
-     */
-    public function setNombre($nombre)
-    {
+    public function setNombre($nombre){
     	$this->nombre = $nombre;
-
     	return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getApellido()
-    {
+    public function getApellido(){
     	return $this->apellido;
     }
 
-    /**
-     * @param mixed $apellido
-     *
-     * @return self
-     */
-    public function setApellido($apellido)
-    {
+    public function setApellido($apellido){
     	$this->apellido = $apellido;
-
     	return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFnac()
-    {
+    public function getFnac(){
     	return $this->fnac;
     }
 
-    /**
-     * @param mixed $fnac
-     *
-     * @return self
-     */
-    public function setFnac($fnac)
-    {
+    public function setFnac($fnac){
     	$this->fnac = $fnac;
-
     	return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getContrasenia()
-    {
+    public function getContrasenia(){
     	return $this->contrasenia;
     }
 
-    /**
-     * @param mixed $contrasenia
-     *
-     * @return self
-     */
-    public function setContrasenia($contrasenia)
-    {
+    public function setContrasenia($contrasenia){
     	$this->contrasenia = $contrasenia;
-
     	return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAdmin()
-    {
+    public function getAdmin(){
     	return $this->admin;
     }
 
-    /**
-     * @param mixed $admin
-     *
-     * @return self
-     */
-    public function setAdmin($admin)
-    {
+    public function setAdmin($admin){
     	$this->admin = $admin;
-
     	return $this;
     }
 }

@@ -584,3 +584,38 @@ $app->post('/cambiarContrasenia', function ($req, $res) {
 	}
 	return $res;
 });
+
+$app->post('/exportarDatos', function ($req, $res) {
+	$params = $req->getParams();
+	$correo = $params['correo'];
+	$desde = $params['desde'];
+	$hasta = $params['hasta'];
+
+	try{
+		$c = new Colocacion();
+		$resultado = (int)$c->enviarCorreoCSV($correo, $desde, $hasta);
+
+		if($resultado == -1){
+			$mensaje = "No hay datos entre las fechas seleccionadas.";
+			$codigo = 1;
+		}else if($resultado == 1){
+			$mensaje = "Datos exportados a su correo.";
+			$codigo = 0;
+		}else{
+			$mensaje = "No se pudo exportar los datos.";
+			$codigo = -1;
+		}
+
+		$res = $res->
+		withStatus(200)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => $codigo, 'mensaje' => $mensaje ]));
+
+	}catch(Exception $e){
+		$res = $res->
+		withStatus(400)->
+		withHeader('Content-type', 'application/json;charset=utf-8')->
+		write(json_encode(['codigo' => -2, 'mensaje' => $e->getMessage()]));
+	}
+	return $res;
+});
