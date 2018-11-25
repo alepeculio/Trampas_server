@@ -3,9 +3,10 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2018 at 05:29 PM
+-- Generation Time: Nov 25, 2018 at 07:49 PM
 -- Server version: 10.1.31-MariaDB
 -- PHP Version: 7.2.3
+
 use u520566866_tramp;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -42,6 +43,8 @@ CREATE TABLE `colocacion` (
   `fechaInicio` datetime NOT NULL,
   `fechaFin` datetime DEFAULT NULL,
   `leishmaniasis` tinyint(1) NOT NULL DEFAULT '0',
+  `flevotomo` int(11) DEFAULT NULL,
+  `perros` int(11) DEFAULT NULL,
   `trampa` int(11) NOT NULL,
   `usuario` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -50,8 +53,8 @@ CREATE TABLE `colocacion` (
 -- Dumping data for table `colocacion`
 --
 
-INSERT INTO `colocacion` (`idColocacion`, `lat`, `lon`, `tempMin`, `tempMax`, `humMin`, `humMax`, `tempProm`, `humProm`, `fechaInicio`, `fechaFin`, `leishmaniasis`, `trampa`, `usuario`) VALUES
-(71, -32.3142892, -58.0510503, NULL, NULL, NULL, NULL, NULL, NULL, '2018-11-23 13:22:22', NULL, 0, 99, 29);
+INSERT INTO `colocacion` (`idColocacion`, `lat`, `lon`, `tempMin`, `tempMax`, `humMin`, `humMax`, `tempProm`, `humProm`, `fechaInicio`, `fechaFin`, `leishmaniasis`, `flevotomo`, `perros`, `trampa`, `usuario`) VALUES
+(7, -32.31144792584386, -58.050339594483376, 66, 33, 0, 0, 32, 0, '2018-11-01 02:59:00', '2018-11-01 12:00:00', 0, 0, 0, 99, 29);
 
 -- --------------------------------------------------------
 
@@ -69,7 +72,7 @@ CREATE TABLE `periodo` (
 --
 
 INSERT INTO `periodo` (`id`, `colocacion`) VALUES
-(25, 71);
+(3, 7);
 
 -- --------------------------------------------------------
 
@@ -156,25 +159,25 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT for table `colocacion`
 --
 ALTER TABLE `colocacion`
-  MODIFY `idColocacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `idColocacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `periodo`
 --
 ALTER TABLE `periodo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `trampa`
 --
 ALTER TABLE `trampa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- AUTO_INCREMENT for table `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- Constraints for dumped tables

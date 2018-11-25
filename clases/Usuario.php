@@ -20,7 +20,7 @@ class Usuario{
 		$this->admin = $admin;
 	}
 
-	function agregar(){
+	public function agregar(){
 		$sql = DB::conexion()->prepare("INSERT INTO usuario (correo, nombre, apellido, contrasenia, admin) VALUES(?,?,?,?,?)");
 		
         if($sql == null)
@@ -29,14 +29,22 @@ class Usuario{
         $sql->bind_param("ssssi",$this->getCorreo(), $this->getNombre(), $this->getApellido(), $this->getContrasenia(), $this->getAdmin());
 
         return $sql->execute();
-        /*if ($sql->execute()){
-			return $sql->insert_id;
-		}else{
-			return false;
-		}*/
 	}
 
-    function login(){
+     public function eliminar(){
+        $id = $this->getId();
+        $activo = 0;
+        $sql = DB::conexion()->prepare("UPDATE usuario SET activo=? WHERE id=?");
+        
+        if($sql == null)
+            throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("ii", $activo, $id);
+        
+        return $sql->execute();
+    }
+
+    public function login(){
         $sql = DB::conexion()->prepare("SELECT * FROM usuario  WHERE correo = ? AND contrasenia = ? AND activo=1");
         
         if($sql == null)
@@ -83,19 +91,6 @@ class Usuario{
     }
 
 
-    public function eliminar(){
-        $id = $this->getId();
-        $activo = 0;
-        $sql = DB::conexion()->prepare("UPDATE usuario SET activo=? WHERE id=?");
-        
-        if($sql == null)
-            throw new Exception('Error de conexion con la BD.');
-
-        $sql->bind_param("ii", $activo, $id);
-        
-        return $sql->execute();
-    }
-
     public function cambiarContrasenia($actual, $nueva){
         $id = $this->getId();
 
@@ -124,8 +119,6 @@ class Usuario{
             return 2;
         }
     }
-
-
  
     public function getId(){
     	return $this->id;

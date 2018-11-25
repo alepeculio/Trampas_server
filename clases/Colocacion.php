@@ -15,7 +15,10 @@ class Colocacion extends Trampa{
 	public $fechaInicio;
 	public $fechaFin;
     public $leishmaniasis;
+    public $flevotomo;
+    public $perros;
 	public $usuario;
+  
 	
 
 	public function __construct($lat = 0, $lon = 0, $trampa = 0, $usuario = 0) {
@@ -40,7 +43,7 @@ class Colocacion extends Trampa{
         }
     }*/
 
-    function colocarTrampa(){
+    public function colocarTrampa(){
         //Obtener periodos de la trampa de la colocacion actual
         $sql = DB::conexion()->prepare("
             SELECT COUNT(p.id) AS cantidad,
@@ -74,7 +77,7 @@ class Colocacion extends Trampa{
         }
     }
 
-    function insertarTrampa($id = 0){
+    public function insertarTrampa($id = 0){
         $sql = DB::conexion()->prepare("INSERT INTO colocacion (lat, lon, fechaInicio, trampa, usuario) VALUES(?,?,?,?,?)");
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -99,7 +102,7 @@ class Colocacion extends Trampa{
         }
     }
 
-    function extraerTrampa(){
+    public function extraerTrampa(){
         $sql = DB::conexion()->prepare("
             UPDATE colocacion 
             SET tempMin=?,
@@ -134,6 +137,8 @@ class Colocacion extends Trampa{
                    c.fechaInicio,
                    c.fechaFin,
                    c.leishmaniasis,
+                   c.flevotomo,
+                   c.perros,
                    c.usuario,
                    p.id AS periodo,
                    c.trampa,
@@ -164,15 +169,37 @@ class Colocacion extends Trampa{
 
 
     public function obtenerColocacionesTrampa( $idTrampa ){
-        $sql = DB::conexion()->prepare("SELECT * FROM colocacion WHERE trampa =".$idTrampa. " ORDER BY fechaInicio DESC");
+        $sql = DB::conexion()->prepare("
+            SELECT c.idColocacion,
+                   c.lat, c.lon,
+                   c.tempMin,
+                   c.tempMax,
+                   c.humMin,
+                   c.humMax,
+                   c.tempProm,
+                   c.humProm,
+                   c.fechaInicio,
+                   c.fechaFin,
+                   c.leishmaniasis,
+                   c.flevotomo,
+                   c.perros,
+                   c.usuario,
+                   p.id AS periodo
+            FROM colocacion c 
+            INNER JOIN periodo p ON c.idColocacion = p.colocacion
+            WHERE c.trampa = ?
+            ORDER BY c.fechaInicio DESC
+            ");
+        
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
+
+        $sql->bind_param("i",$idTrampa);
 
         $sql->execute();
 
         $resultado=$sql->get_result();
         while ($fila=$resultado->fetch_object()) {
-            $fila->trampa = null;
             $fila->leishmaniasis = (boolean)$fila->leishmaniasis;
             $colocaciones[] = $fila;
         }
@@ -204,6 +231,8 @@ class Colocacion extends Trampa{
         $fechaInicio = $this->getFechaInicio();
         $fechaFin = $this->getFechaFin();
         $leishmaniasis = $this->getLeishmaniasis();
+        $flevotomo = $this->getFlevotomo();
+        $perros = $this->getPerros();
 
         $sql = DB::conexion()->prepare("
             UPDATE colocacion
@@ -217,14 +246,16 @@ class Colocacion extends Trampa{
                 humProm=?,
                 fechaInicio=?,
                 fechaFin=?,
-                leishmaniasis=?
+                leishmaniasis=?,
+                flevotomo=?,
+                perros=?
             WHERE idColocacion=?
             ");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
-        $sql->bind_param("ddssssssssii",$lat, $lon, $tempMin, $tempMax, $humMin, $humMax, $tempProm, $humProm, $fechaInicio, $fechaFin, $leishmaniasis, $id);
+        $sql->bind_param("ddssssssssiiii",$lat, $lon, $tempMin, $tempMax, $humMin, $humMax, $tempProm, $humProm, $fechaInicio, $fechaFin, $leishmaniasis, $flevotomo, $perros, $id);
         
         return $sql->execute();
     }
@@ -252,7 +283,8 @@ class Colocacion extends Trampa{
     public function obtenerColocacionesGrafica($idPeriodo){
          $sql = DB::conexion()->prepare("
             SELECT c.idColocacion,
-                   c.lat, c.lon,
+                   c.lat, 
+                   c.lon,
                    c.tempMin,
                    c.tempMax,
                    c.humMin,
@@ -286,18 +318,17 @@ class Colocacion extends Trampa{
         return $colocaciones;
     }
 
-    function enviarCorreoCSV($correo, $desde, $hasta) {
+    public function enviarCorreoCSV($correo, $desde, $hasta) {
         // This will provide plenty adequate entropy
         $multipartSep = '-----'.md5(time()).'-----';
 
         $headers = array(
-            "From: hospitalwebuy@gmail.com",
-            "Reply-To: hospitalwebuy@gmail.com",
+            "From: trampas.paysandu@gmail.com", //hospitalwebuy@gmail.com;
+            "Reply-To: trampas.paysandu@gmail.com",
             "Content-Type: multipart/mixed; boundary=".$multipartSep
         );
 
         $csv = $this->generarCSV($desde, $hasta);
-
         if($csv == -1){
             return $csv;
         }else{
@@ -336,6 +367,8 @@ class Colocacion extends Trampa{
                    c.fechaInicio,
                    c.fechaFin,
                    c.leishmaniasis,
+                   c.flevotomo,
+                   c.perros,
                    u.nombre,
                    u.apellido, 
                    u.correo
@@ -377,6 +410,8 @@ class Colocacion extends Trampa{
                     'Fecha inicio',
                     'Fecha fin',
                     'Leishmaniasis',
+                    'Flevotomo',
+                    'Perros',
                     'Nombre',
                     'Apellido',
                     'Correo'
@@ -518,6 +553,24 @@ class Colocacion extends Trampa{
         $this->leishmaniasis = $leishmaniasis;
         return $this;
     }
+
+
+    public function getFlevotomo(){
+        return $this->flevotomo;
+    }
+
+    public function setFlevotomo($flevotomo){
+        $this->flevotomo = $flevotomo;
+    }
+
+    public function getPerros(){
+        return $this->perros;
+    }
+
+    public function setPerros($perros){
+        $this->perros = $perros;
+    }
+
 }
 
 ?> 

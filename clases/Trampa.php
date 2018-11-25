@@ -12,33 +12,6 @@ class Trampa {
 		$this->nombre = $nombre;
 		$this->mac = $mac;
 	}
-	
-	public function getNombre(){
-		return $this->nombre;
-	}
-
-	public function getId(){
-		return $this->id;
-	}
-
-	public function setNombre($nombre){
-		$this->nombre = $nombre;
-		return $this;
-	}
-
-	public function setId($id){
-		$this->id = $id;
-		return $this;
-	}
-
-	public function getMac(){
-		return $this->mac;
-	}
-
-	public function setMac($mac){
-		$this->mac = $mac;
-		return $this;
-	}
 
 	//Retorna el id de la trampa agregada o false en caso de que el nombre ya exista.
 	public function agregar(){
@@ -183,6 +156,32 @@ class Trampa {
 		return $trampas;
 	}
 
+	public function getNombre(){
+		return $this->nombre;
+	}
+
+	public function getId(){
+		return $this->id;
+	}
+
+	public function setNombre($nombre){
+		$this->nombre = $nombre;
+		return $this;
+	}
+
+	public function setId($id){
+		$this->id = $id;
+		return $this;
+	}
+
+	public function getMac(){
+		return $this->mac;
+	}
+
+	public function setMac($mac){
+		$this->mac = $mac;
+		return $this;
+	}
 
 }
 

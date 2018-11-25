@@ -318,6 +318,8 @@ $app->post('/actualizarColocacion', function ($req, $res) {
 	$hMax = (float)$params['hmax'];
 	$hProm = (float)$params['hprom'];
 	$leishmaniasis = (boolean)$params['leishmaniasis'];
+	$flevotomo = (int)$params['flevotomo'];
+	$perros = (int)$params['perros'];
 
 	try{
 		$colocacion = new Colocacion($lat, $lon);
@@ -330,6 +332,8 @@ $app->post('/actualizarColocacion', function ($req, $res) {
 		$colocacion->setTempProm($tProm);
 		$colocacion->setHumProm($hProm);
 		$colocacion->setLeishmaniasis($leishmaniasis);
+		$colocacion->setFlevotomo($flevotomo);
+		$colocacion->setPerros($perros);
 		$resultado = $colocacion->actualizar($id);
 
 		if($resultado == false){
