@@ -378,8 +378,11 @@ class Colocacion extends Trampa{
             INNER JOIN periodo AS p ON c.idColocacion = p.colocacion";
 
        if($desde != '' && $hasta != '')
-            $consulta .= " WHERE c.fechaInicio BETWEEN ? AND ?";
-
+            if($desde == $hasta)
+                $consulta .= " WHERE c.fechaInicio = ?";
+            else
+                $consulta .= " WHERE c.fechaInicio BETWEEN ? AND ?";
+        
 
         $sql = DB::conexion()->prepare($consulta);
        
@@ -387,7 +390,10 @@ class Colocacion extends Trampa{
             throw new Exception('Error de conexion con la BD.');
         
         if($desde != '' && $hasta != '')
-            $sql->bind_param('ss', $desde, $hasta);
+             if($desde == $hasta)
+                $sql->bind_param('s', $desde);
+            else
+                $sql->bind_param('ss', $desde, $hasta);
 
         $sql->execute();
         
