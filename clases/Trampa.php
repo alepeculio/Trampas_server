@@ -13,7 +13,6 @@ class Trampa {
 		$this->mac = $mac;
 	}
 
-	//Retorna el id de la trampa agregada o false en caso de que el nombre ya exista.
 	public function agregar(){
 		$nombre = $this->getNombre();
 		$mac = $this->getMac();
@@ -153,6 +152,7 @@ class Trampa {
 		while ($fila=$resultado->fetch_object()) {
 			$trampas[] = $fila;
 		}
+		
 		return $trampas;
 	}
 

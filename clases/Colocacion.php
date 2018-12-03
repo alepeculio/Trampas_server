@@ -31,7 +31,6 @@ class Colocacion extends Trampa{
 
 
     public function colocarTrampa(){
-        //Obtener periodos de la trampa de la colocacion actual
         $sql = DB::conexion()->prepare("
             SELECT COUNT(p.id) AS cantidad,
                    p.id 
@@ -110,8 +109,7 @@ class Colocacion extends Trampa{
         return $sql->execute();
     }
 
-    public function obtenerColocacionesActivas(){
-        //$sql = DB::conexion()->prepare("SELECT * FROM `colocacion` WHERE fechaFin IS NULL");
+    public function obtenerColocaciones(){
         $sql = DB::conexion()->prepare("
             SELECT c.idColocacion,
                    c.lat, c.lon,
@@ -135,7 +133,7 @@ class Colocacion extends Trampa{
             INNER JOIN trampa t ON c.trampa = t.id 
             INNER JOIN periodo p ON c.idColocacion = p.colocacion
             WHERE t.activa = 1 
-            ORDER BY c.fechaInicio DESC/* AND c.fechaFin IS NULL*/
+            ORDER BY c.fechaInicio DESC
             ");
         
         if($sql == null)
@@ -306,11 +304,10 @@ class Colocacion extends Trampa{
     }
 
     public function enviarCorreoCSV($correo, $desde, $hasta) {
-        // This will provide plenty adequate entropy
         $multipartSep = '-----'.md5(time()).'-----';
 
         $headers = array(
-            "From: trampas.paysandu@gmail.com", //hospitalwebuy@gmail.com;
+            "From: trampas.paysandu@gmail.com",
             "Reply-To: trampas.paysandu@gmail.com",
             "Content-Type: multipart/mixed; boundary=".$multipartSep
         );

@@ -7,12 +7,13 @@ ini_set("display_errors", 1);
 
 set_include_path(dirname(__FILE__) . '/../../');
 
+//Comprueba que existe un usuario con 'correo' y 'contrasenia' en la tabla 'usuario'.
 $app->post('/login', function($req, $res) {
 	$params=$req->getParams();
 	$correo=$params['correo'];
 	$contrasenia=$params['contrasenia'];
 	
-	$this->logger->addInfo("INFO: Login: Usuario".$correo); 
+	$this->logger->addInfo("Login: ".$correo); 
 
 	try{
 		$usuario = new Usuario(0,$correo, NULL, NULL, $contrasenia, 0);
@@ -39,6 +40,7 @@ $app->post('/login', function($req, $res) {
 	return $res;
 });
 
+//Inserta una fila en la tabla 'trampa'.
 $app->post('/agregarTrampa', function ($req, $res) {
 	$params = $req->getParams();
 	$nombre = $params['nombre'];
@@ -69,6 +71,7 @@ $app->post('/agregarTrampa', function ($req, $res) {
 	return $res;
 });
 
+//Setea el campo 'activa' de la trampa con el id recido a false.
 $app->post('/eliminarTrampa', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
@@ -98,7 +101,7 @@ $app->post('/eliminarTrampa', function ($req, $res) {
 	return $res;
 });
 
-//Devuelve todas las trampas de la tabla Trampa y la ultima colocacion de cada una.
+//Devuelve todas las trampas de la tabla 'trampa' y la última colocación de cada una.
 $app->get('/obtenerTrampas', function ($req, $res) {
 	$params = $req->getParams();
 	try{
@@ -118,6 +121,7 @@ $app->get('/obtenerTrampas', function ($req, $res) {
 	return $res;
 });
 
+//Devuelve las trampas de la tabla 'trampa' que tienen alguna colocación con leishmaniasis y la última colocación de cada una.
 $app->get('/obtenerTrampasLeishmaniasis', function ($req, $res) {
 	$params = $req->getParams();
 	try{
@@ -137,7 +141,7 @@ $app->get('/obtenerTrampasLeishmaniasis', function ($req, $res) {
 	return $res;
 });
 
-//Devuelve todas las trampas que no tienen un colocacion activa.
+//Devuelve todas las trampas que no están colocadas actualmente (ninguna colocación con fechaFin null).
 $app->get('/obtenerTrampasNoColocadas', function ($req, $res) {
 	$params = $req->getParams();
 	try{
@@ -157,6 +161,7 @@ $app->get('/obtenerTrampasNoColocadas', function ($req, $res) {
 	return $res;
 });
 
+//Devuelve todas las trampas que están colocadas actualmente (alguna colocación con fechaFin null).
 $app->get('/obtenerTrampasColocadas', function ($req, $res) {
 	$params = $req->getParams();
 	try{
@@ -176,7 +181,8 @@ $app->get('/obtenerTrampasColocadas', function ($req, $res) {
 	return $res;
 });
 
-//Agrega una colocacion activa a la trabla Colocacion.
+/*Inserta una fila en la tabla 'colocacion' y en 'periodo' 
+(si hay algún periodo con menos de tres filas de esa trampa se completa, sino se crea uno nuevo). */
 $app->post('/colocarTrampa', function ($req, $res) {	
 	$params = $req->getParams();
 	$lat = (double)$params['lat'];
@@ -208,6 +214,7 @@ $app->post('/colocarTrampa', function ($req, $res) {
 	return $res;
 });
 
+//Se actualiza la información de la última colocación de la trampa con id igual a 'id_trampa'.
 $app->post('/extraerTrampa', function ($req, $res) {	
 	$params = $req->getParams();
 	$tMin = (float)$params['tmin'];
@@ -250,6 +257,7 @@ $app->post('/extraerTrampa', function ($req, $res) {
 	return $res;
 });
 
+//Se actualiza la ubicación de la colocación con idColocacion igual a 'id'.
 $app->post('/actualizarUbicacionColocacion', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
@@ -281,6 +289,7 @@ $app->post('/actualizarUbicacionColocacion', function ($req, $res) {
 	return $res;
 });
 
+//Se actualizan todos los datos de la colocación con idColocacion igual a 'id'.
 $app->post('/actualizarColocacion', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
@@ -335,12 +344,12 @@ $app->post('/actualizarColocacion', function ($req, $res) {
 	return $res;
 });
 
-//Devuelve todas las colocaciones cuya fecha de fin no es null.
-$app->get('/obtenerColocacionesActivas', function ($req, $res) {
+//Devuelve todas las colocaciones exitentes.
+$app->get('/obtenerColocaciones', function ($req, $res) {
 	$params = $req->getParams();
 	try{
 		$colocacion = new Colocacion();
-		$resultado = $colocacion->obtenerColocacionesActivas();
+		$resultado = $colocacion->obtenerColocaciones();
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -355,7 +364,7 @@ $app->get('/obtenerColocacionesActivas', function ($req, $res) {
 	return $res;
 });
 
-//Devuelve todas las colocaciones de una Trampa.
+//Devuelve todas las colocaciones de la trampa con 'id' igual a 'id'.
 $app->post('/obtenerColocacionesTrampa', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
@@ -377,6 +386,7 @@ $app->post('/obtenerColocacionesTrampa', function ($req, $res) {
 	return $res;
 });
 
+//Devuelve todas las colocaciones del periodo con 'id' igual a 'id_periodo'.
 $app->post('/obtenerColocacionesGrafica', function ($req, $res) {
 	$params = $req->getParams();
 	$idPeriodo = (int)$params['id_periodo'];
@@ -398,6 +408,7 @@ $app->post('/obtenerColocacionesGrafica', function ($req, $res) {
 	return $res;
 });
 
+//Desvuelve la colocación con 'idColocacion' igual a 'id'.
 $app->get('/obtenerColocacion', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
@@ -419,6 +430,7 @@ $app->get('/obtenerColocacion', function ($req, $res) {
 	return $res;
 });
 
+//Inserta una fila en la tabla 'usuario'.
 $app->post('/agregarUsuario', function ($req, $res) {	
 	$params = $req->getParams();
 	$correo = $params['correo'];
@@ -452,6 +464,7 @@ $app->post('/agregarUsuario', function ($req, $res) {
 	return $res;
 });
 
+//Devuelve todos los usuarios existentes.
 $app->get('/obtenerUsuarios', function ($req, $res) {
 	$params = $req->getParams();
 	try{
@@ -471,6 +484,7 @@ $app->get('/obtenerUsuarios', function ($req, $res) {
 	return $res;
 });
 
+//Actualiza el 'admin' del usuario con 'id' igual a 'id'.
 $app->post('/actualizarPrivilegios', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
@@ -501,6 +515,8 @@ $app->post('/actualizarPrivilegios', function ($req, $res) {
 	return $res;
 });
 
+
+//Actualiza el campo 'activo' del usuario a false.
 $app->post('/eliminarUsuario', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
@@ -531,6 +547,7 @@ $app->post('/eliminarUsuario', function ($req, $res) {
 	return $res;
 });
 
+//Comprueba que la contraseña actual sea correcta y si es asi la actualiza por 'contrasenia_nueva'.
 $app->post('/cambiarContrasenia', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
@@ -566,6 +583,7 @@ $app->post('/cambiarContrasenia', function ($req, $res) {
 	return $res;
 });
 
+//Envia un correo con los datos en formato csv entre las fechas 'desde' y 'hasta'.
 $app->post('/exportarDatos', function ($req, $res) {
 	$params = $req->getParams();
 	$correo = $params['correo'];
