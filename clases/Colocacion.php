@@ -30,19 +30,6 @@ class Colocacion extends Trampa{
 	}
 
 
-	/*function colocarTrampa(){
-		$sql = DB::conexion()->prepare("INSERT INTO colocacion (lat, lon, fechaInicio, trampa, usuario) VALUES(?,?,?,?,?)");
-		if($sql == null)
-            throw new Exception('Error de conexion con la BD.');
-
-        $sql->bind_param("ddsii", $this->getLat(), $this->getLon(), $this->getFechaInicio(), $this->getId(),$this->getUsuario());
-        if($sql->execute()){
-            return $sql->insert_id;
-        }else{
-            return false;
-        }
-    }*/
-
     public function colocarTrampa(){
         //Obtener periodos de la trampa de la colocacion actual
         $sql = DB::conexion()->prepare("

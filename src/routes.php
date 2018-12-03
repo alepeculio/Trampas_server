@@ -19,10 +19,10 @@ $app->post('/login', function($req, $res) {
 		$usuarioLogueado = $usuario-> login();
 		if($usuarioLogueado != 0){
 			$codigo = 1;
-			$mensaje = "Login correcto";
+			$mensaje = "Login correcto.";
 		}else{
 			$codigo = 0;
-			$mensaje = "Correo o/y contraseña incorrectos";
+			$mensaje = "Correo o/y contraseña incorrectos.";
 			$usuarioLogueado = null;
 		}
 		$res = $res->
@@ -107,7 +107,7 @@ $app->get('/obtenerTrampas', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'trampas' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto.', 'trampas' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
@@ -126,7 +126,7 @@ $app->get('/obtenerTrampasLeishmaniasis', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'trampas' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto.', 'trampas' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
@@ -146,7 +146,7 @@ $app->get('/obtenerTrampasNoColocadas', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'trampas' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto.', 'trampas' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
@@ -165,7 +165,7 @@ $app->get('/obtenerTrampasColocadas', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'trampas' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto.', 'trampas' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
@@ -175,29 +175,6 @@ $app->get('/obtenerTrampasColocadas', function ($req, $res) {
 	}
 	return $res;
 });
-
-/*
-//Devuelve la ultima colocacion
-$app->get('/obtenerUltimaColocacion', function ($req, $res) {
-	$params = $req->getParams();
-	$id = $params['id'];
-
-	try{
-		$colocacion = new Colocacion();
-		$resultado = $colocacion->obtenerUltimaColocacion($id);
-		$res = $res->
-		withStatus(200)->
-		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'colocaciones' => $resultado]));
-
-	}catch(Exception $e){
-		$res = $res->
-		withStatus(400)->
-		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => -1, 'mensaje' => $e->getMessage()]));
-	}
-	return $res;
-});*/
 
 //Agrega una colocacion activa a la trabla Colocacion.
 $app->post('/colocarTrampa', function ($req, $res) {	
@@ -254,7 +231,7 @@ $app->post('/extraerTrampa', function ($req, $res) {
 		$resultado = $colocacion -> extraerTrampa();
 		if($resultado == false){
 			$codigo = 0;
-			$mensaje = "Error al extraer la trampa";
+			$mensaje = "Error al extraer la trampa.";
 		}else{
 			$codigo = 1;
 			$mensaje = "Trampa extraida.";
@@ -340,7 +317,7 @@ $app->post('/actualizarColocacion', function ($req, $res) {
 			$mensaje = "No se pudo actualizar colocación.";
 			$codigo = "-1";
 		}else{
-			$mensaje = "Colocación actualizada";
+			$mensaje = "Colocación actualizada.";
 			$codigo = "1";
 		}
 
@@ -367,7 +344,7 @@ $app->get('/obtenerColocacionesActivas', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'colocaciones' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto.', 'colocaciones' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
@@ -389,7 +366,7 @@ $app->post('/obtenerColocacionesTrampa', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'colocaciones' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto.', 'colocaciones' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
@@ -410,7 +387,7 @@ $app->post('/obtenerColocacionesGrafica', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'colocaciones' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto.', 'colocaciones' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
@@ -431,7 +408,7 @@ $app->get('/obtenerColocacion', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Colocación obtenida correctamente', 'colocacion' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Colocación obtenida correctamente.', 'colocacion' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
@@ -483,7 +460,7 @@ $app->get('/obtenerUsuarios', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto', 'usuarios' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Listado correcto.', 'usuarios' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
