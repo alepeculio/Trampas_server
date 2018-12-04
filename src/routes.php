@@ -16,8 +16,7 @@ $app->post('/login', function($req, $res) {
 	$this->logger->addInfo("Login: ".$correo); 
 
 	try{
-		$usuario = new Usuario(0,$correo, NULL, NULL, $contrasenia, 0);
-		$usuarioLogueado = $usuario-> login();
+		$usuarioLogueado = Usuario::login($correo, $contrasenia);
 		if($usuarioLogueado != 0){
 			$codigo = 1;
 			$mensaje = "Login correcto.";
@@ -46,8 +45,7 @@ $app->post('/agregarTrampa', function ($req, $res) {
 	$nombre = $params['nombre'];
 	$mac = $params['mac'];
 	try{
-		$trampa = new Trampa(0, $nombre, $mac);
-		$resultado = $trampa->agregar();
+		$resultado = Trampa::agregar($nombre, $mac);
 
 		if($resultado == false){
 			$mensaje = "Nombre ya en uso.";
@@ -76,8 +74,7 @@ $app->post('/eliminarTrampa', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
 	try{
-		$trampa = new Trampa($id);
-		$resultado = $trampa->eliminar();
+		$resultado = Trampa::eliminar($id);
 
 		if($resultado == false){
 			$mensaje = "No se pudo eliminar la trampa.";
@@ -105,8 +102,7 @@ $app->post('/eliminarTrampa', function ($req, $res) {
 $app->get('/obtenerTrampas', function ($req, $res) {
 	$params = $req->getParams();
 	try{
-		$trampa = new Trampa();
-		$resultado = $trampa->obtenerTrampas();
+		$resultado = Trampa::obtenerTrampas();
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -125,8 +121,7 @@ $app->get('/obtenerTrampas', function ($req, $res) {
 $app->get('/obtenerTrampasLeishmaniasis', function ($req, $res) {
 	$params = $req->getParams();
 	try{
-		$trampa = new Trampa();
-		$resultado = $trampa->obtenerTrampas(true);
+		$resultado = Trampa::obtenerTrampas(true);
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -145,8 +140,7 @@ $app->get('/obtenerTrampasLeishmaniasis', function ($req, $res) {
 $app->get('/obtenerTrampasNoColocadas', function ($req, $res) {
 	$params = $req->getParams();
 	try{
-		$trampa = new Trampa();
-		$resultado = $trampa->obtenerTrampasNoColocadas();
+		$resultado = Trampa::obtenerTrampasNoColocadas();
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -165,8 +159,7 @@ $app->get('/obtenerTrampasNoColocadas', function ($req, $res) {
 $app->get('/obtenerTrampasColocadas', function ($req, $res) {
 	$params = $req->getParams();
 	try{
-		$trampa = new Trampa();
-		$resultado = $trampa->obtenerTrampasColocadas();
+		$resultado = Trampa::obtenerTrampasColocadas();
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -191,8 +184,7 @@ $app->post('/colocarTrampa', function ($req, $res) {
 	$idUsuario = (int)$params['id_usuario'];
 
 	try{
-		$colocacion = new Colocacion($lat, $lon, $idTrampa, $idUsuario);
-		$resultado = $colocacion -> colocarTrampa();
+		$resultado = Colocacion::colocarTrampa($lat, $lon, $idTrampa, $idUsuario);
 		if($resultado == false){
 			$codigo = 0;
 			$mensaje = "Error al colocar la trampa.";
@@ -226,16 +218,7 @@ $app->post('/extraerTrampa', function ($req, $res) {
 	$idTrampa = (int)$params['id_trampa'];
 
 	try{
-		$fechaFin = date_create(NULL, timezone_open("America/Montevideo"))->format('Y-m-d H:i:s');
-		$colocacion = new Colocacion(0, 0, $idTrampa,0);
-		$colocacion->setTempMin($tMin);
-		$colocacion->setTempMax($tMax);
-		$colocacion->setHumMin($hMin);
-		$colocacion->setHumMax($hMax);
-		$colocacion->setFechaFin($fechaFin);
-		$colocacion->setTempProm($tProm);
-		$colocacion->setHumProm($hProm);
-		$resultado = $colocacion -> extraerTrampa();
+		$resultado = Colocacion::extraerTrampa($tMin, $tMax, $hMin, $hMax, $tProm, $hProm, $idTrampa);
 		if($resultado == false){
 			$codigo = 0;
 			$mensaje = "Error al extraer la trampa.";
@@ -264,8 +247,7 @@ $app->post('/actualizarUbicacionColocacion', function ($req, $res) {
 	$lat = (double)$params['lat'];
 	$lon = (double)$params['lon'];
 	try{
-		$colocacion = new Colocacion($lat,$lon);
-		$resultado = $colocacion->actualizarUbicacion($id);
+		$resultado = Colocacion::actualizarUbicacion($id, $lat, $lon);
 
 		if($resultado == false){
 			$mensaje = "No se pudo guardar los cambios.";
@@ -295,32 +277,49 @@ $app->post('/actualizarColocacion', function ($req, $res) {
 	$id = (int)$params['id'];
 	$lat = (double)$params['lat'];
 	$lon = (double)$params['lon'];
-	$fechaInicio = $params['finicio'];
-	$fechaFin = $params['ffin'];
-	$tMin = (float)$params['tmin'];
-	$tMax = (float)$params['tmax'];
-	$tProm = (float)$params['tprom'];
-	$hMin = (float)$params['hmin'];
-	$hMax = (float)$params['hmax'];
-	$hProm = (float)$params['hprom'];
+	$fechaInicio = $params['fInicio'];
+	$fechaFin = $params['fFin'];
+	$tMin = (float)$params['tMin'];
+	$tMax = (float)$params['tMax'];
+	$tProm = (float)$params['tProm'];
+	$hMin = (float)$params['hMin'];
+	$hMax = (float)$params['hMax'];
+	$hProm = (float)$params['hProm'];
 	$leishmaniasis = (boolean)$params['leishmaniasis'];
-	$flevotomo = (int)$params['flevotomo'];
-	$perros = (int)$params['perros'];
+	$flebotomos = (int)$params['flebotomos'];
+	$habitantes = (int)$params['habitantes'];
+	$observaciones = $params['observaciones'];
+	$perrosExistentes = (int)$params['perrosExistentes'];
+	$perrosMuestreados = (int)$params['perrosMuestreados'];
+	$perrosPositivos = (int)$params['perrosPositivos'];
+	$perrosProcedencia = $params['perrosProcedencia'];
+	$perrosEutanasiados = (int)$params['perrosEutanasiados'];
+	$otrasAcciones = $params['otrasAcciones'];
 
 	try{
-		$colocacion = new Colocacion($lat, $lon);
-		$colocacion->setFechaInicio($fechaInicio);
-		$colocacion->setFechaFin($fechaFin);
-		$colocacion->setTempMin($tMin);
-		$colocacion->setTempMax($tMax);
-		$colocacion->setHumMin($hMin);
-		$colocacion->setHumMax($hMax);
-		$colocacion->setTempProm($tProm);
-		$colocacion->setHumProm($hProm);
-		$colocacion->setLeishmaniasis($leishmaniasis);
-		$colocacion->setFlevotomo($flevotomo);
-		$colocacion->setPerros($perros);
-		$resultado = $colocacion->actualizar($id);
+		$resultado = Colocacion::actualizar(
+			$id, 
+			$lat, 
+			$lon,
+			$fechaInicio,
+			$fechaFin,
+			$tMin,
+			$tMax,
+			$tProm,
+			$hMin,
+			$hMax,
+			$hProm,
+			$leishmaniasis,
+			$flebotomos,
+			$habitantes,
+			$observaciones,
+			$perrosExistentes,
+			$perrosMuestreados,
+			$perrosPositivos,
+			$perrosProcedencia,
+			$perrosEutanasiados,
+			$otrasAcciones
+		);
 
 		if($resultado == false){
 			$mensaje = "No se pudo actualizar colocación.";
@@ -348,8 +347,7 @@ $app->post('/actualizarColocacion', function ($req, $res) {
 $app->get('/obtenerColocaciones', function ($req, $res) {
 	$params = $req->getParams();
 	try{
-		$colocacion = new Colocacion();
-		$resultado = $colocacion->obtenerColocaciones();
+		$resultado = Colocacion::obtenerColocaciones();
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -370,8 +368,7 @@ $app->post('/obtenerColocacionesTrampa', function ($req, $res) {
 	$id = (int)$params['id'];
 
 	try{
-		$colocacion = new Colocacion();
-		$resultado = $colocacion->obtenerColocacionesTrampa($id);
+		$resultado = Colocacion::obtenerColocacionesTrampa($id);
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -392,8 +389,7 @@ $app->post('/obtenerColocacionesGrafica', function ($req, $res) {
 	$idPeriodo = (int)$params['id_periodo'];
 
 	try{
-		$colocacion = new Colocacion();
-		$resultado = $colocacion->obtenerColocacionesGrafica($idPeriodo);
+		$resultado = Colocacion::obtenerColocacionesGrafica($idPeriodo);
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -408,14 +404,13 @@ $app->post('/obtenerColocacionesGrafica', function ($req, $res) {
 	return $res;
 });
 
-//Desvuelve la colocación con 'idColocacion' igual a 'id'.
-$app->get('/obtenerColocacion', function ($req, $res) {
+//Devuelve la colocación con 'idColocacion' igual a 'id'.
+$app->post('/obtenerColocacion', function ($req, $res) {
 	$params = $req->getParams();
 	$id = (int)$params['id'];
 
 	try{
-		$colocacion = new Colocacion();
-		$resultado = $colocacion->obtenerColocacion($id);
+		$resultado = Colocacion::obtenerColocacion($id);
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -440,9 +435,7 @@ $app->post('/agregarUsuario', function ($req, $res) {
 	$admin = (int)$params['admin'];
 	
 	try{
-		$usuario = new Usuario(0,$correo, $nombre, $apellido, $contrasenia, $admin);
-		$resultado = $usuario-> agregar();
-		$codigo;
+		$resultado = Usuario::agregar($correo, $nombre, $apellido, $contrasenia, $admin);
 		if($resultado){
 			$codigo = 1;
 			$mensaje = 'Registrado correctamente.';
@@ -468,8 +461,7 @@ $app->post('/agregarUsuario', function ($req, $res) {
 $app->get('/obtenerUsuarios', function ($req, $res) {
 	$params = $req->getParams();
 	try{
-		$usuario = new Usuario();
-		$resultado = $usuario->obtenerUsuarios();
+		$resultado = Usuario::obtenerUsuarios();
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
@@ -490,8 +482,7 @@ $app->post('/actualizarPrivilegios', function ($req, $res) {
 	$id = (int)$params['id'];
 	$admin = (int)$params['admin'];
 	try{
-		$usuario = new Usuario($id, null, null, null, null, $admin);
-		$resultado = $usuario->actualizarPrivilegios();
+		$resultado = Usuario::actualizarPrivilegios($id , $admin);
 
 		if($resultado == false){
 			$mensaje = "No se pudo actualizar los privilegios.";
@@ -522,8 +513,7 @@ $app->post('/eliminarUsuario', function ($req, $res) {
 	$id = (int)$params['id'];
 
 	try{
-		$usuario = new Usuario($id);
-		$resultado = $usuario->eliminar();
+		$resultado = Usuario::eliminar($id);
 
 		if($resultado == false){
 			$mensaje = "No se pudo eliminar el usuario.";
@@ -555,8 +545,7 @@ $app->post('/cambiarContrasenia', function ($req, $res) {
 	$contraseniaNueva = $params['contrasenia_nueva'];
 
 	try{
-		$usuario = new Usuario($id);
-		$resultado = $usuario->cambiarContrasenia($contraseniaActual, $contraseniaNueva);
+		$resultado = Usuario::cambiarContrasenia($id, $contraseniaActual, $contraseniaNueva);
 
 		if($resultado == 2){
 			$mensaje = "Contraseña actual incorrecta.";
@@ -591,8 +580,7 @@ $app->post('/exportarDatos', function ($req, $res) {
 	$hasta = $params['hasta'];
 
 	try{
-		$c = new Colocacion();
-		$resultado = (int)$c->enviarCorreoCSV($correo, $desde, $hasta);
+		$resultado = (int)Colocacion::enviarCorreoCSV($correo, $desde, $hasta);
 
 		if($resultado == -1){
 			$mensaje = "No hay datos entre las fechas seleccionadas.";

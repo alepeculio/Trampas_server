@@ -13,9 +13,7 @@ class Trampa {
 		$this->mac = $mac;
 	}
 
-	public function agregar(){
-		$nombre = $this->getNombre();
-		$mac = $this->getMac();
+	public static function agregar($nombre, $mac){
 		$sql = DB::conexion()->prepare("INSERT INTO trampa (nombre, mac) VALUES(?, ?)");
 		
 		if($sql == null)
@@ -30,8 +28,7 @@ class Trampa {
 		}
 	}
 
-	public function eliminar(){
-		$id = $this->getId();
+	public static function eliminar($id){
 		$activa = 0;
 		$sql = DB::conexion()->prepare("UPDATE trampa SET activa=? WHERE id=?");
 		
@@ -43,7 +40,7 @@ class Trampa {
 		return $sql->execute();
 	}
 
-	public function obtenerTrampas($leishmaniasis = false){
+	public static function obtenerTrampas($leishmaniasis = false){
 		$query;
 		if($leishmaniasis)
 			$query = "SELECT DISTINCT t.id,
@@ -111,7 +108,7 @@ class Trampa {
 		return $trampas;
 	}
 
-	public function obtenerTrampasNoColocadas(){
+	public static function obtenerTrampasNoColocadas(){
 		$sql = DB::conexion()->prepare("
 			SELECT *
 			FROM trampa 
@@ -133,7 +130,7 @@ class Trampa {
 		return $trampas;
 	}
 
-	public function obtenerTrampasColocadas(){
+	public static function obtenerTrampasColocadas(){
 		$sql = DB::conexion()->prepare("
 			SELECT *
 			FROM trampa
@@ -156,6 +153,8 @@ class Trampa {
 		return $trampas;
 	}
 
+
+	//geters y setters.
 	public function getNombre(){
 		return $this->nombre;
 	}

@@ -15,8 +15,15 @@ class Colocacion extends Trampa{
 	public $fechaInicio;
 	public $fechaFin;
     public $leishmaniasis;
-    public $flevotomo;
-    public $perros;
+    public $flebotomos;
+    public $habitantes;
+    public $observaciones;
+    public $perrosExitentes;
+    public $perrosMuestreados;
+    public $perrosPositivos;
+    public $perrosProcedencia;
+    public $perrosEutanasiados;
+    public $otrasAcciones;
 	public $usuario;
   
 	
@@ -30,7 +37,7 @@ class Colocacion extends Trampa{
 	}
 
 
-    public function colocarTrampa(){
+    public static function colocarTrampa($lat, $lon, $idTrampa, $idUsuario){
         $sql = DB::conexion()->prepare("
             SELECT COUNT(p.id) AS cantidad,
                    p.id 
@@ -44,31 +51,31 @@ class Colocacion extends Trampa{
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
-        $sql->bind_param("i", $this->getId());
+        $sql->bind_param("i", $idTrampa);
         $sql->execute();
         $resultado = $sql->get_result();
 
         if($resultado->num_rows != null){
             while ($fila = $resultado -> fetch_object()) {
-                $coso[] = $fila;
                 if( $fila->cantidad < 3){
-                    return $this->insertarTrampa($fila->id);
+                    return Colocacion::insertarTrampa($fila->id, $lat, $lon, $idTrampa, $idUsuario);
                 }else{
-                    return $this->insertarTrampa();
+                    return Colocacion::insertarTrampa(0, $lat, $lon, $idTrampa, $idUsuario);
                 }
             }
-            return $coso;
         }else{
-           return $this->insertarTrampa();
+           return Colocacion::insertarTrampa(0, $lat, $lon, $idTrampa, $idUsuario);
         }
     }
 
-    public function insertarTrampa($id = 0){
+    public function insertarTrampa($idPeriodo, $lat, $lon, $idTrampa, $idUsuario){
+        $fechaInicio = date_create(NULL, timezone_open("America/Montevideo"))->format('Y-m-d H:i:s');
+
         $sql = DB::conexion()->prepare("INSERT INTO colocacion (lat, lon, fechaInicio, trampa, usuario) VALUES(?,?,?,?,?)");
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
-        $sql->bind_param("ddsii", $this->getLat(), $this->getLon(), $this->getFechaInicio(), $this->getId(),$this->getUsuario());
+        $sql->bind_param("ddsii", $lat, $lon, $fechaInicio, $idTrampa, $idUsuario);
         if($sql->execute()){
             $idColocacion = $sql->insert_id;
 
@@ -76,7 +83,7 @@ class Colocacion extends Trampa{
             if($sql2 == null)
                 throw new Exception('Error de conexion con la BD.');
             
-            $sql2->bind_param("ii", $id, $idColocacion);
+            $sql2->bind_param("ii", $idPeriodo, $idColocacion);
             
             if($sql2->execute()){
                 return $idColocacion;
@@ -88,7 +95,8 @@ class Colocacion extends Trampa{
         }
     }
 
-    public function extraerTrampa(){
+    public static function extraerTrampa($tMin, $tMax, $hMin, $hMax, $tProm, $hProm, $idTrampa){
+        $fechaFin = date_create(NULL, timezone_open("America/Montevideo"))->format('Y-m-d H:i:s');
         $sql = DB::conexion()->prepare("
             UPDATE colocacion 
             SET tempMin=?,
@@ -104,31 +112,38 @@ class Colocacion extends Trampa{
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
-        $sql->bind_param("ddddddsi", $this->getTempMin(), $this->getTempMax(), $this->getHumMin(), $this->getHumMax(),$this->getTempProm(), $this->getHumProm() ,$this->getFechaFin(),$this->getId());
+        $sql->bind_param("ddddddsi", $tMin, $tMax, $hMin, $hMax, $tProm, $hProm ,$fechaFin , $idTrampa);
         
         return $sql->execute();
     }
 
-    public function obtenerColocaciones(){
+    public static function obtenerColocaciones(){
         $sql = DB::conexion()->prepare("
-            SELECT c.idColocacion,
-                   c.lat, c.lon,
-                   c.tempMin,
-                   c.tempMax,
-                   c.humMin,
-                   c.humMax,
-                   c.tempProm,
-                   c.humProm,
-                   c.fechaInicio,
-                   c.fechaFin,
-                   c.leishmaniasis,
-                   c.flevotomo,
-                   c.perros,
-                   c.usuario,
-                   p.id AS periodo,
-                   c.trampa,
-                   t.nombre,
-                   t.mac
+            SELECT  c.idColocacion,
+                    c.lat, c.lon,
+                    c.tempMin,
+                    c.tempMax,
+                    c.humMin,
+                    c.humMax,
+                    c.tempProm,
+                    c.humProm,
+                    c.fechaInicio,
+                    c.fechaFin,
+                    c.leishmaniasis,
+                    c.flebotomos,
+                    c.habitantes,
+                    c.observaciones,
+                    c.perrosExistentes,
+                    c.perrosMuestreados,
+                    c.perrosPositivos,
+                    c.perrosProcedencia,
+                    c.perrosEutanasiados,
+                    c.otrasAcciones,
+                    c.usuario,
+                    p.id AS periodo,
+                    c.trampa,
+                    t.nombre,
+                    t.mac
             FROM colocacion c 
             INNER JOIN trampa t ON c.trampa = t.id 
             INNER JOIN periodo p ON c.idColocacion = p.colocacion
@@ -153,23 +168,31 @@ class Colocacion extends Trampa{
     }
 
 
-    public function obtenerColocacionesTrampa( $idTrampa ){
+    public static function obtenerColocacionesTrampa( $idTrampa ){
         $sql = DB::conexion()->prepare("
-            SELECT c.idColocacion,
-                   c.lat, c.lon,
-                   c.tempMin,
-                   c.tempMax,
-                   c.humMin,
-                   c.humMax,
-                   c.tempProm,
-                   c.humProm,
-                   c.fechaInicio,
-                   c.fechaFin,
-                   c.leishmaniasis,
-                   c.flevotomo,
-                   c.perros,
-                   c.usuario,
-                   p.id AS periodo
+            SELECT  c.idColocacion,
+                    c.lat, 
+                    c.lon,
+                    c.tempMin,
+                    c.tempMax,
+                    c.humMin,
+                    c.humMax,
+                    c.tempProm,
+                    c.humProm,
+                    c.fechaInicio,
+                    c.fechaFin,
+                    c.leishmaniasis,
+                    c.flebotomos,
+                    c.habitantes,
+                    c.observaciones,
+                    c.perrosExistentes,
+                    c.perrosMuestreados,
+                    c.perrosPositivos,
+                    c.perrosProcedencia,
+                    c.perrosEutanasiados,
+                    c.otrasAcciones,
+                    c.usuario,
+                    p.id AS periodo
             FROM colocacion c 
             INNER JOIN periodo p ON c.idColocacion = p.colocacion
             WHERE c.trampa = ?
@@ -191,9 +214,7 @@ class Colocacion extends Trampa{
         return $colocaciones;
     }
 
-    public function actualizarUbicacion($id){
-        $lat = $this->getLat();
-        $lon = $this->getLon();
+    public static function actualizarUbicacion($id, $lat, $lon){
         $sql = DB::conexion()->prepare("UPDATE colocacion SET lat=?, lon=? WHERE idColocacion=?");
         
         if($sql == null)
@@ -204,48 +225,86 @@ class Colocacion extends Trampa{
         return $sql->execute();
     }
 
-    public function actualizar($id){
-        $lat = $this->getLat();
-        $lon = $this->getLon();
-        $tempMin = $this->getTempMin();
-        $tempMax = $this->getTempMax();
-        $tempProm = $this->getTempProm();
-        $humMin = $this->getHumMin();
-        $humMax = $this->getHumMax();
-        $humProm = $this->getHumProm();
-        $fechaInicio = $this->getFechaInicio();
-        $fechaFin = $this->getFechaFin();
-        $leishmaniasis = $this->getLeishmaniasis();
-        $flevotomo = $this->getFlevotomo();
-        $perros = $this->getPerros();
+    public static function actualizar(
+            $id, 
+            $lat, 
+            $lon, 
+            $fechaInicio,
+            $fechaFin,
+            $tMin,
+            $tMax,
+            $tProm,
+            $hMin,
+            $hMax,
+            $hProm,
+            $leishmaniasis,
+            $flebotomos,
+            $habitantes,
+            $observaciones,
+            $perrosExistentes,
+            $perrosMuestreados,
+            $perrosPositivos,
+            $perrosProcedencia,
+            $perrosEutanasiados,
+            $otrasAcciones
+        ){
 
         $sql = DB::conexion()->prepare("
             UPDATE colocacion
             SET lat=?,
                 lon=?,
-                tempMin=?,
-                tempMax=?,
-                humMin=?,
-                humMax=?,
-                tempProm=?,
-                humProm=?,
                 fechaInicio=?,
                 fechaFin=?,
+                tempMin=?,
+                tempMax=?,
+                tempProm=?,
+                humMin=?,
+                humMax=?,
+                humProm=?,
                 leishmaniasis=?,
-                flevotomo=?,
-                perros=?
+                flebotomos=?,
+                habitantes=?,
+                observaciones=?,
+                perrosExistentes=?,
+                perrosMuestreados=?,
+                perrosPositivos=?,
+                perrosProcedencia=?,
+                perrosEutanasiados=?,
+                otrasAcciones=?
             WHERE idColocacion=?
             ");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
-        $sql->bind_param("ddssssssssiiii",$lat, $lon, $tempMin, $tempMax, $humMin, $humMax, $tempProm, $humProm, $fechaInicio, $fechaFin, $leishmaniasis, $flevotomo, $perros, $id);
+        $sql->bind_param("ddssssssssiiisiiisisi", 
+            $lat, 
+            $lon, 
+            $fechaInicio,
+            $fechaFin,
+            $tMin,
+            $tMax,
+            $tProm,
+            $hMin,
+            $hMax,
+            $hProm,
+            $leishmaniasis,
+            $flebotomos,
+            $habitantes,
+            $observaciones,
+            $perrosExistentes,
+            $perrosMuestreados,
+            $perrosPositivos,
+            $perrosProcedencia,
+            $perrosEutanasiados,
+            $otrasAcciones, 
+            $id
+        );
         
         return $sql->execute();
     }
 
-    public function obtenerColocacion($id){
+    public static function obtenerColocacion($id){
         $sql = DB::conexion()->prepare("SELECT * FROM colocacion WHERE idColocacion=?");
         
         if($sql == null)
@@ -265,22 +324,10 @@ class Colocacion extends Trampa{
         return $colocacion;
     }
 
-    public function obtenerColocacionesGrafica($idPeriodo){
+    public static function obtenerColocacionesGrafica($idPeriodo){
          $sql = DB::conexion()->prepare("
-            SELECT c.idColocacion,
-                   c.lat, 
-                   c.lon,
-                   c.tempMin,
-                   c.tempMax,
-                   c.humMin,
-                   c.humMax,
-                   c.tempProm,
-                   c.humProm,
-                   c.fechaInicio,
-                   c.fechaFin,
-                   c.leishmaniasis,
-                   c.usuario,
-                   p.id AS periodo
+            SELECT c.tempProm,
+                   c.HumProm
             FROM periodo AS p 
             RIGHT JOIN colocacion AS c ON p.colocacion = c.idColocacion 
             WHERE p.id = ?
@@ -296,14 +343,12 @@ class Colocacion extends Trampa{
 
         $colocaciones = [];
         while ($fila = $resultado->fetch_object()) {
-          $fila->trampa = null;
-          $fila->leishmaniasis = (boolean)$fila->leishmaniasis;
           $colocaciones[] = $fila;
         }
         return $colocaciones;
     }
 
-    public function enviarCorreoCSV($correo, $desde, $hasta) {
+    public static function enviarCorreoCSV($correo, $desde = '', $hasta = '') {
         $multipartSep = '-----'.md5(time()).'-----';
 
         $headers = array(
@@ -312,7 +357,7 @@ class Colocacion extends Trampa{
             "Content-Type: multipart/mixed; boundary=".$multipartSep
         );
 
-        $csv = $this->generarCSV($desde, $hasta);
+        $csv = Colocacion::generarCSV($desde, $hasta);
         if($csv == -1){
             return $csv;
         }else{
@@ -337,25 +382,32 @@ class Colocacion extends Trampa{
         return @mail($correo, 'Trampas - Datos exportados', $body, implode("\r\n", $headers));
     }
 
-    public function generarCSV($desde, $hasta){
+    public static function generarCSV($desde, $hasta){
          $consulta = 
-         "SELECT p.id AS periodo,
-                   c.lat,
-                   c.lon,
-                   c.tempMin,
-                   c.tempMax,
-                   c.tempProm,
-                   c.humMin,
-                   c.humMax,
-                   c.humProm,
-                   c.fechaInicio,
-                   c.fechaFin,
-                   c.leishmaniasis,
-                   c.flevotomo,
-                   c.perros,
-                   u.nombre,
-                   u.apellido, 
-                   u.correo
+         "SELECT    p.id AS periodo,
+                    c.lat,
+                    c.lon,
+                    c.tempMin,
+                    c.tempMax,
+                    c.tempProm,
+                    c.humMin,
+                    c.humMax,
+                    c.humProm,
+                    c.fechaInicio,
+                    c.fechaFin,
+                    c.leishmaniasis,
+                    c.flebotomos,
+                    c.habitantes,
+                    c.observaciones,
+                    c.perrosExistentes,
+                    c.perrosMuestreados,
+                    c.perrosPositivos,
+                    c.perrosProcedencia,
+                    c.perrosEutanasiados,
+                    c.otrasAcciones,
+                    u.nombre,
+                    u.apellido, 
+                    u.correo
             FROM colocacion AS c
             INNER JOIN trampa AS t ON c.trampa = t.id
             INNER JOIN usuario AS u ON c.usuario = u.id
@@ -370,9 +422,9 @@ class Colocacion extends Trampa{
         }
 
         $sql = DB::conexion()->prepare($consulta);
-       
+
         if($sql == null)
-            throw new Exception('Error de conexion con la BD.');
+             throw new Exception('Error de conexion con la BD.');
         
         if($desde != '' && $hasta != ''){
             if((strcmp($desde, $hasta) == 0) == 1){
@@ -424,6 +476,8 @@ class Colocacion extends Trampa{
         }
     }
 
+
+    //geters y setters.
     public function getIdColocacion(){
     	return $this->idColocacion;
     }

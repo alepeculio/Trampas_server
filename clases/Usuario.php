@@ -20,19 +20,18 @@ class Usuario{
 		$this->admin = $admin;
 	}
 
-	public function agregar(){
+	public static function agregar($correo, $nombre, $apellido, $contrasenia, $admin){
 		$sql = DB::conexion()->prepare("INSERT INTO usuario (correo, nombre, apellido, contrasenia, admin) VALUES(?,?,?,?,?)");
 		
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
-        $sql->bind_param("ssssi",$this->getCorreo(), $this->getNombre(), $this->getApellido(), $this->getContrasenia(), $this->getAdmin());
+        $sql->bind_param("ssssi", $correo, $nombre, $apellido, $contrasenia, $admin);
 
         return $sql->execute();
 	}
 
-     public function eliminar(){
-        $id = $this->getId();
+     public static function eliminar($id){
         $activo = 0;
         $sql = DB::conexion()->prepare("UPDATE usuario SET activo=? WHERE id=?");
         
@@ -44,13 +43,13 @@ class Usuario{
         return $sql->execute();
     }
 
-    public function login(){
+    public static function login($correo, $contrasenia){
         $sql = DB::conexion()->prepare("SELECT * FROM usuario  WHERE correo = ? AND contrasenia = ? AND activo=1");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
-        $sql->bind_param ("ss", $this->getCorreo(), $this->getContrasenia());
+        $sql->bind_param ("ss", $correo, $contrasenia);
         $sql->execute();
 
         $resultado =  $sql->get_result();
@@ -62,7 +61,7 @@ class Usuario{
         }
     }
 
-    public function obtenerUsuarios(){
+    public static function obtenerUsuarios(){
         $sql = DB::conexion()->prepare("SELECT * FROM `usuario` WHERE activo=1 AND admin != 3");
 
         if($sql == null)
@@ -77,9 +76,7 @@ class Usuario{
         return $usuarios;
     }
 
-    public function actualizarPrivilegios(){
-        $id = $this->getId();
-        $admin = $this->getAdmin();
+    public static function actualizarPrivilegios($id, $admin){
         $sql = DB::conexion()->prepare("UPDATE usuario SET admin=? WHERE id=?");
         
         if($sql == null)
@@ -91,9 +88,7 @@ class Usuario{
     }
 
 
-    public function cambiarContrasenia($actual, $nueva){
-        $id = $this->getId();
-
+    public static function cambiarContrasenia($id, $actual, $nueva){
         $sql = DB::conexion()->prepare("SELECT * FROM usuario  WHERE id = ? AND contrasenia = ? AND activo=1");
 
         if($sql == null)
@@ -119,7 +114,9 @@ class Usuario{
             return 2;
         }
     }
- 
+
+
+    //geters y setters.
     public function getId(){
     	return $this->id;
     }
