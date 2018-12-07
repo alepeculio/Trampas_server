@@ -3,11 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2018 at 07:49 PM
+-- Generation Time: Dec 07, 2018 at 01:24 AM
 -- Server version: 10.1.31-MariaDB
 -- PHP Version: 7.2.3
-
-use u520566866_tramp;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -43,18 +41,18 @@ CREATE TABLE `colocacion` (
   `fechaInicio` datetime NOT NULL,
   `fechaFin` datetime DEFAULT NULL,
   `leishmaniasis` tinyint(1) NOT NULL DEFAULT '0',
-  `flevotomo` int(11) DEFAULT NULL,
-  `perros` int(11) DEFAULT NULL,
+  `flebotomos` int(11) DEFAULT NULL,
+  `habitantes` int(11) DEFAULT NULL,
+  `observaciones` longtext,
+  `perrosExistentes` int(11) DEFAULT NULL,
+  `perrosMuestreados` int(11) DEFAULT NULL,
+  `perrosPositivos` int(11) DEFAULT NULL,
+  `perrosProcedencia` varchar(250) DEFAULT NULL,
+  `perrosEutanasiados` int(11) DEFAULT NULL,
+  `otrasAcciones` longtext,
   `trampa` int(11) NOT NULL,
   `usuario` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `colocacion`
---
-
-INSERT INTO `colocacion` (`idColocacion`, `lat`, `lon`, `tempMin`, `tempMax`, `humMin`, `humMax`, `tempProm`, `humProm`, `fechaInicio`, `fechaFin`, `leishmaniasis`, `flevotomo`, `perros`, `trampa`, `usuario`) VALUES
-(7, -32.31144792584386, -58.050339594483376, 66, 33, 0, 0, 32, 0, '2018-11-01 02:59:00', '2018-11-01 12:00:00', 0, 0, 0, 99, 29);
 
 -- --------------------------------------------------------
 
@@ -66,13 +64,6 @@ CREATE TABLE `periodo` (
   `id` int(11) NOT NULL,
   `colocacion` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `periodo`
---
-
-INSERT INTO `periodo` (`id`, `colocacion`) VALUES
-(3, 7);
 
 -- --------------------------------------------------------
 
@@ -86,13 +77,6 @@ CREATE TABLE `trampa` (
   `mac` varchar(30) NOT NULL,
   `activa` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `trampa`
---
-
-INSERT INTO `trampa` (`id`, `nombre`, `mac`, `activa`) VALUES
-(99, 'Trampa7', '20:16:10:27:80:42', 1);
 
 -- --------------------------------------------------------
 
@@ -109,14 +93,6 @@ CREATE TABLE `usuario` (
   `contrasenia` varchar(250) NOT NULL,
   `admin` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `usuario`
---
-
-INSERT INTO `usuario` (`id`, `correo`, `nombre`, `apellido`, `activo`, `contrasenia`, `admin`) VALUES
-(29, 'alejandropeculio@gmail.com', 'Alejandro', 'Peculio', 1, 'ale', 1),
-(30, 'visitante@trampas.com', 'Usuario', 'visitante', 1, 'visitante', 3);
 
 --
 -- Indexes for dumped tables
@@ -159,25 +135,25 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT for table `colocacion`
 --
 ALTER TABLE `colocacion`
-  MODIFY `idColocacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `idColocacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
 
 --
 -- AUTO_INCREMENT for table `periodo`
 --
 ALTER TABLE `periodo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
 
 --
 -- AUTO_INCREMENT for table `trampa`
 --
 ALTER TABLE `trampa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- Constraints for dumped tables
