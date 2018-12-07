@@ -224,7 +224,7 @@ $app->post('/extraerTrampa', function ($req, $res) {
 			$mensaje = "Error al extraer la trampa.";
 		}else{
 			$codigo = 1;
-			$mensaje = "Trampa extraida.";
+			$mensaje = "Trampa extraída.";
 		}
 		$res = $res->
 		withStatus(200)->
@@ -414,7 +414,7 @@ $app->post('/obtenerColocacion', function ($req, $res) {
 		$res = $res->
 		withStatus(200)->
 		withHeader('Content-type', 'application/json;charset=utf-8')->
-		write(json_encode(['codigo' => 1, 'mensaje' => 'Colocación obtenida correctamente.', 'colocacion' => $resultado]));
+		write(json_encode(['codigo' => 1, 'mensaje' => 'Colocación obtenida.', 'colocacion' => $resultado]));
 
 	}catch(Exception $e){
 		$res = $res->
