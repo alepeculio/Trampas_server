@@ -55,7 +55,8 @@ class Usuario{
         $resultado =  $sql->get_result();
 
         if($resultado -> num_rows == 1){
-            return $resultado -> fetch_object();
+            $usuario =  $resultado -> fetch_object();
+            return $usuario;
         }else{
             return 0;
         }
