@@ -50,3 +50,11 @@
 [2018-12-09 22:39:39] slim-app.INFO: Login: visitante@trampas.com [] {"uid":"2a8a5d3"}
 [2018-12-09 22:39:41] slim-app.INFO: Login: visitante@trampas.com [] {"uid":"246d0db"}
 [2018-12-09 22:39:54] slim-app.INFO: Login: usuario@trampas.com [] {"uid":"0062a69"}
+[2018-12-10 18:12:36] slim-app.INFO: Login: usuario@trampas.com [] {"uid":"c95ec35"}
+[2018-12-10 18:21:02] slim-app.INFO: Login: usuarioejemplo@gmail.com [] {"uid":"b47f027"}
+[2018-12-10 18:54:47] slim-app.INFO: Login: visitante@trampas.com [] {"uid":"6f432ec"}
+[2018-12-10 18:56:54] slim-app.INFO: Login: usuario@trampas.com [] {"uid":"d14013d"}
+[2018-12-10 19:01:55] slim-app.INFO: Login: usuario@trampas.com [] {"uid":"395207a"}
+[2018-12-10 19:04:54] slim-app.INFO: Login: alejandropeculio@gmail.com [] {"uid":"16d6249"}
+[2018-12-10 19:04:59] slim-app.INFO: Login: alejandropeculio@gmail.com [] {"uid":"6fb29af"}
+[2018-12-10 19:05:27] slim-app.INFO: Login: alejandropeculio@gmail.com [] {"uid":"145d370"}

@@ -327,7 +327,7 @@ class Colocacion extends Trampa{
     public static function obtenerColocacionesGrafica($idPeriodo){
          $sql = DB::conexion()->prepare("
             SELECT c.tempProm,
-                   c.HumProm
+                   c.humProm
             FROM periodo AS p 
             RIGHT JOIN colocacion AS c ON p.colocacion = c.idColocacion 
             WHERE p.id = ?
@@ -455,8 +455,15 @@ class Colocacion extends Trampa{
                     'Fecha inicio',
                     'Fecha fin',
                     'Leishmaniasis',
-                    'Flevotomo',
-                    'Perros',
+                    'Cant flebótomos',
+                    'Habitantes vivienda',
+                    'Observaciones',
+                    'Perros existentes',
+                    'Perros muestreados',
+                    'Perros positivos',
+                    'Procedencia de perros positivos',
+                    'Perros eutanasiados',
+                    'Otras acciones',
                     'Nombre',
                     'Apellido',
                     'Correo'
