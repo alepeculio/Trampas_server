@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 07, 2018 at 01:24 AM
+-- Generation Time: Dec 17, 2018 at 09:04 PM
 -- Server version: 10.1.31-MariaDB
 -- PHP Version: 7.2.3
 
@@ -93,6 +93,15 @@ CREATE TABLE `usuario` (
   `contrasenia` varchar(250) NOT NULL,
   `admin` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `usuario`
+--
+
+INSERT INTO `usuario` (`id`, `correo`, `nombre`, `apellido`, `activo`, `contrasenia`, `admin`) VALUES
+(29, 'alejandropeculio@gmail.com', 'Usuario', 'administrador', 1, 'd033e22ae348aeb5660fc2140aec35850c4da997', 1),
+(30, 'visitante@trampas.com', 'Usuario', 'visitante', 1, '9008518feb2dac356019ba40bc0682523f071301', 3),
+(31, 'usuario@trampas.com', 'Usuario', 'normal', 1, '356a192b7913b04c54574d18c28d46e6395428ab', 0);
 
 --
 -- Indexes for dumped tables
