@@ -99,9 +99,8 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `correo`, `nombre`, `apellido`, `activo`, `contrasenia`, `admin`) VALUES
-(29, 'alejandropeculio@gmail.com', 'Usuario', 'administrador', 1, 'd033e22ae348aeb5660fc2140aec35850c4da997', 1),
-(30, 'visitante@trampas.com', 'Usuario', 'visitante', 1, '9008518feb2dac356019ba40bc0682523f071301', 3),
-(31, 'usuario@trampas.com', 'Usuario', 'normal', 1, '356a192b7913b04c54574d18c28d46e6395428ab', 0);
+(29, 'refpaysandu@gmail.com', 'Usuario', 'administrador', 1, '2A67A28CB70CDBA4397402CB8860CF235FCA7D9F', 1),
+(30, 'visitante@trampas.com', 'Usuario', 'visitante', 1, '9008518feb2dac356019ba40bc0682523f071301', 3);
 
 --
 -- Indexes for dumped tables
