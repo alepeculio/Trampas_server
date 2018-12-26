@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `colocacion`
 --
 
-CREATE TABLE `colocacion` (
+CREATE TABLE `trampas_colocacion` (
   `idColocacion` int(11) NOT NULL,
   `lat` double NOT NULL,
   `lon` double NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE `colocacion` (
 -- Table structure for table `periodo`
 --
 
-CREATE TABLE `periodo` (
+CREATE TABLE `trampas_periodo` (
   `id` int(11) NOT NULL,
   `colocacion` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -71,7 +71,7 @@ CREATE TABLE `periodo` (
 -- Table structure for table `trampa`
 --
 
-CREATE TABLE `trampa` (
+CREATE TABLE `trampas_trampa` (
   `id` int(11) NOT NULL,
   `nombre` varchar(250) NOT NULL,
   `mac` varchar(30) NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE `trampa` (
 -- Table structure for table `usuario`
 --
 
-CREATE TABLE `usuario` (
+CREATE TABLE `trampas_usuario` (
   `id` int(11) NOT NULL,
   `correo` varchar(250) NOT NULL,
   `nombre` varchar(100) NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE `usuario` (
 -- Dumping data for table `usuario`
 --
 
-INSERT INTO `usuario` (`id`, `correo`, `nombre`, `apellido`, `activo`, `contrasenia`, `admin`) VALUES
+INSERT INTO `trampas_usuario` (`id`, `correo`, `nombre`, `apellido`, `activo`, `contrasenia`, `admin`) VALUES
 (29, 'refpaysandu@gmail.com', 'Usuario', 'administrador', 1, '2A67A28CB70CDBA4397402CB8860CF235FCA7D9F', 1),
 (30, 'visitante@trampas.com', 'Usuario', 'visitante', 1, '9008518feb2dac356019ba40bc0682523f071301', 3);
 
@@ -109,7 +109,7 @@ INSERT INTO `usuario` (`id`, `correo`, `nombre`, `apellido`, `activo`, `contrase
 --
 -- Indexes for table `colocacion`
 --
-ALTER TABLE `colocacion`
+ALTER TABLE `trampas_colocacion`
   ADD PRIMARY KEY (`idColocacion`),
   ADD KEY `usuario` (`usuario`),
   ADD KEY `trampa` (`trampa`);
@@ -117,21 +117,21 @@ ALTER TABLE `colocacion`
 --
 -- Indexes for table `periodo`
 --
-ALTER TABLE `periodo`
+ALTER TABLE `trampas_periodo`
   ADD PRIMARY KEY (`id`,`colocacion`),
   ADD KEY `colocacion` (`colocacion`);
 
 --
 -- Indexes for table `trampa`
 --
-ALTER TABLE `trampa`
+ALTER TABLE `trampas_trampa`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nombre` (`nombre`);
 
 --
 -- Indexes for table `usuario`
 --
-ALTER TABLE `usuario`
+ALTER TABLE `trampas_usuario`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `correo` (`correo`);
 
@@ -142,25 +142,25 @@ ALTER TABLE `usuario`
 --
 -- AUTO_INCREMENT for table `colocacion`
 --
-ALTER TABLE `colocacion`
+ALTER TABLE `trampas_colocacion`
   MODIFY `idColocacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
 
 --
 -- AUTO_INCREMENT for table `periodo`
 --
-ALTER TABLE `periodo`
+ALTER TABLE `trampas_periodo`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
 
 --
 -- AUTO_INCREMENT for table `trampa`
 --
-ALTER TABLE `trampa`
+ALTER TABLE `trampas_trampa`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `usuario`
 --
-ALTER TABLE `usuario`
+ALTER TABLE `trampas_usuario`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
@@ -170,15 +170,15 @@ ALTER TABLE `usuario`
 --
 -- Constraints for table `colocacion`
 --
-ALTER TABLE `colocacion`
-  ADD CONSTRAINT `colocacion_ibfk_1` FOREIGN KEY (`usuario`) REFERENCES `usuario` (`id`),
-  ADD CONSTRAINT `colocacion_ibfk_2` FOREIGN KEY (`trampa`) REFERENCES `trampa` (`id`);
+ALTER TABLE `trampas_colocacion`
+  ADD CONSTRAINT `colocacion_ibfk_1` FOREIGN KEY (`usuario`) REFERENCES `trampas_usuario` (`id`),
+  ADD CONSTRAINT `colocacion_ibfk_2` FOREIGN KEY (`trampa`) REFERENCES `trampas_trampa` (`id`);
 
 --
 -- Constraints for table `periodo`
 --
-ALTER TABLE `periodo`
-  ADD CONSTRAINT `periodo_ibfk_1` FOREIGN KEY (`colocacion`) REFERENCES `colocacion` (`idColocacion`);
+ALTER TABLE `trampas_periodo`
+  ADD CONSTRAINT `periodo_ibfk_1` FOREIGN KEY (`colocacion`) REFERENCES `trampas_colocacion` (`idColocacion`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

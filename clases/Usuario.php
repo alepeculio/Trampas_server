@@ -21,7 +21,7 @@ class Usuario{
 	}
 
 	public static function agregar($correo, $nombre, $apellido, $contrasenia, $admin){
-		$sql = DB::conexion()->prepare("INSERT INTO usuario (correo, nombre, apellido, contrasenia, admin) VALUES(?,?,?,?,?)");
+		$sql = DB::conexion()->prepare("INSERT INTO trampas_usuario (correo, nombre, apellido, contrasenia, admin) VALUES(?,?,?,?,?)");
 		
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -33,7 +33,7 @@ class Usuario{
 
      public static function eliminar($id){
         $activo = 0;
-        $sql = DB::conexion()->prepare("UPDATE usuario SET activo=? WHERE id=?");
+        $sql = DB::conexion()->prepare("UPDATE trampas_usuario SET activo=? WHERE id=?");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -44,7 +44,7 @@ class Usuario{
     }
 
     public static function login($correo, $contrasenia){
-        $sql = DB::conexion()->prepare("SELECT * FROM usuario  WHERE correo = ? AND contrasenia = ? AND activo=1");
+        $sql = DB::conexion()->prepare("SELECT * FROM trampas_usuario  WHERE correo = ? AND contrasenia = ? AND activo=1");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -63,7 +63,7 @@ class Usuario{
     }
 
     public static function obtenerUsuarios(){
-        $sql = DB::conexion()->prepare("SELECT * FROM `usuario` WHERE activo=1 AND admin != 3");
+        $sql = DB::conexion()->prepare("SELECT * FROM `trampas_usuario` WHERE activo=1 AND admin != 3");
 
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -78,7 +78,7 @@ class Usuario{
     }
 
     public static function actualizarPrivilegios($id, $admin){
-        $sql = DB::conexion()->prepare("UPDATE usuario SET admin=? WHERE id=?");
+        $sql = DB::conexion()->prepare("UPDATE trampas_usuario SET admin=? WHERE id=?");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -90,7 +90,7 @@ class Usuario{
 
 
     public static function cambiarContrasenia($id, $actual, $nueva){
-        $sql = DB::conexion()->prepare("SELECT * FROM usuario  WHERE id = ? AND contrasenia = ? AND activo=1");
+        $sql = DB::conexion()->prepare("SELECT * FROM trampas_usuario  WHERE id = ? AND contrasenia = ? AND activo=1");
 
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -101,7 +101,7 @@ class Usuario{
         $resultado = $sql->get_result();
 
         if($resultado->num_rows == 1){ 
-           $sql2 = DB::conexion()->prepare("UPDATE usuario SET contrasenia = ? WHERE id=?");
+           $sql2 = DB::conexion()->prepare("UPDATE trampas_usuario SET contrasenia = ? WHERE id=?");
 
             if($sql2 == null)
                 throw new Exception('Error de conexion con la BD.');

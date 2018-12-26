@@ -41,8 +41,8 @@ class Colocacion extends Trampa{
         $sql = DB::conexion()->prepare("
             SELECT COUNT(p.id) AS cantidad,
                    p.id 
-            FROM periodo AS p 
-            LEFT JOIN colocacion AS c ON p.colocacion = c.idColocacion
+            FROM trampas_periodo AS p 
+            LEFT JOIN trampas_colocacion AS c ON p.colocacion = c.idColocacion
             WHERE c.trampa = ?
             GROUP BY p.id
             ORDER BY p.id DESC
@@ -71,7 +71,7 @@ class Colocacion extends Trampa{
     public function insertarTrampa($idPeriodo, $lat, $lon, $idTrampa, $idUsuario){
         $fechaInicio = date_create(NULL, timezone_open("America/Montevideo"))->format('Y-m-d H:i:s');
 
-        $sql = DB::conexion()->prepare("INSERT INTO colocacion (lat, lon, fechaInicio, trampa, usuario) VALUES(?,?,?,?,?)");
+        $sql = DB::conexion()->prepare("INSERT INTO trampas_colocacion (lat, lon, fechaInicio, trampa, usuario) VALUES(?,?,?,?,?)");
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
 
@@ -79,7 +79,7 @@ class Colocacion extends Trampa{
         if($sql->execute()){
             $idColocacion = $sql->insert_id;
 
-            $sql2 = DB::conexion()->prepare("INSERT INTO periodo (id, colocacion) VALUES(?,?)");
+            $sql2 = DB::conexion()->prepare("INSERT INTO trampas_periodo (id, colocacion) VALUES(?,?)");
             if($sql2 == null)
                 throw new Exception('Error de conexion con la BD.');
             
@@ -98,7 +98,7 @@ class Colocacion extends Trampa{
     public static function extraerTrampa($tMin, $tMax, $hMin, $hMax, $tProm, $hProm, $idTrampa){
         $fechaFin = date_create(NULL, timezone_open("America/Montevideo"))->format('Y-m-d H:i:s');
         $sql = DB::conexion()->prepare("
-            UPDATE colocacion 
+            UPDATE trampas_colocacion 
             SET tempMin=?,
                 tempMax=?,
                 humMin=?,
@@ -144,9 +144,9 @@ class Colocacion extends Trampa{
                     c.trampa,
                     t.nombre,
                     t.mac
-            FROM colocacion c 
-            INNER JOIN trampa t ON c.trampa = t.id 
-            INNER JOIN periodo p ON c.idColocacion = p.colocacion
+            FROM trampas_colocacion c 
+            INNER JOIN trampas_trampa t ON c.trampa = t.id 
+            INNER JOIN trampas_periodo p ON c.idColocacion = p.colocacion
             WHERE t.activa = 1 
             ORDER BY c.fechaInicio DESC
             ");
@@ -193,8 +193,8 @@ class Colocacion extends Trampa{
                     c.otrasAcciones,
                     c.usuario,
                     p.id AS periodo
-            FROM colocacion c 
-            INNER JOIN periodo p ON c.idColocacion = p.colocacion
+            FROM trampas_colocacion c 
+            INNER JOIN trampas_periodo p ON c.idColocacion = p.colocacion
             WHERE c.trampa = ?
             ORDER BY c.fechaInicio DESC
             ");
@@ -215,7 +215,7 @@ class Colocacion extends Trampa{
     }
 
     public static function actualizarUbicacion($id, $lat, $lon){
-        $sql = DB::conexion()->prepare("UPDATE colocacion SET lat=?, lon=? WHERE idColocacion=?");
+        $sql = DB::conexion()->prepare("UPDATE trampas_colocacion SET lat=?, lon=? WHERE idColocacion=?");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -250,7 +250,7 @@ class Colocacion extends Trampa{
         ){
 
         $sql = DB::conexion()->prepare("
-            UPDATE colocacion
+            UPDATE trampas_colocacion
             SET lat=?,
                 lon=?,
                 fechaInicio=?,
@@ -305,7 +305,7 @@ class Colocacion extends Trampa{
     }
 
     public static function obtenerColocacion($id){
-        $sql = DB::conexion()->prepare("SELECT * FROM colocacion WHERE idColocacion=?");
+        $sql = DB::conexion()->prepare("SELECT * FROM trampas_colocacion WHERE idColocacion=?");
         
         if($sql == null)
             throw new Exception('Error de conexion con la BD.');
@@ -328,8 +328,8 @@ class Colocacion extends Trampa{
          $sql = DB::conexion()->prepare("
             SELECT c.tempProm,
                    c.humProm
-            FROM periodo AS p 
-            RIGHT JOIN colocacion AS c ON p.colocacion = c.idColocacion 
+            FROM trampas_periodo AS p 
+            RIGHT JOIN trampas_colocacion AS c ON p.colocacion = c.idColocacion 
             WHERE p.id = ?
             ");
         
@@ -408,10 +408,10 @@ class Colocacion extends Trampa{
                     u.nombre,
                     u.apellido, 
                     u.correo
-            FROM colocacion AS c
-            INNER JOIN trampa AS t ON c.trampa = t.id
-            INNER JOIN usuario AS u ON c.usuario = u.id
-            INNER JOIN periodo AS p ON c.idColocacion = p.colocacion";
+            FROM trampas_colocacion AS c
+            INNER JOIN trampas_trampa AS t ON c.trampa = t.id
+            INNER JOIN trampas_usuario AS u ON c.usuario = u.id
+            INNER JOIN trampas_periodo AS p ON c.idColocacion = p.colocacion";
 
        if($desde != '' && $hasta != ''){
             if((strcmp($desde, $hasta) == 0) == 1){
