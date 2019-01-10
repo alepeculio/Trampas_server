@@ -7,6 +7,22 @@ ini_set("display_errors", 1);
 
 set_include_path(dirname(__FILE__) . '/../../');
 
+$app->get('/', function($req, $res){
+	?>
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>Trampas</title>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<h1>Trampas</h1>
+		<h5>Esta API está diseñada para ser accedida únicamente desde la aplicación móvil, para acceder a las funcionalidades desde aquí esciba el nombre de la función directamente en la url.</h5>
+	</body>
+	</html>
+	<?php
+});
+
 //Comprueba que existe un usuario con 'correo' y 'contrasenia' en la tabla 'usuario'.
 $app->post('/login', function($req, $res) {
 	$params=$req->getParams();
